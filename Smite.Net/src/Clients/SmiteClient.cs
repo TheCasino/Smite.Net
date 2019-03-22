@@ -1,23 +1,58 @@
-﻿namespace Smite.Net
+﻿using System;
+using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Smite.Net
 {
-    public sealed class SmiteClient
+    public sealed partial class SmiteClient : ISmiteClient
     {
-        public SmiteClientConfig Config { get; private set; }
+        private readonly RestClient _restClient;
+        private readonly SmiteClientConfig _config;
 
-        private readonly RestClient _client;
+        private SessionModel _currentSession;
 
-        public SmiteClient(string devKey, string authKey) : this(new SmiteClientConfig
+        private readonly Timer _sessionTimer;
+
+        internal SmiteClient(RestClient rest, SmiteClientConfig config, SessionModel session)
         {
-            DevKey = devKey,
-            AuthKey = authKey
-        })
-        {
+            _restClient = rest;
+            _config = config;
+            _currentSession = session;
+
+            var time = DateTimeOffset.ParseExact(_currentSession.timestamp, "yyyyMMddHHmmss",
+                CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+
+            var when = time - DateTimeOffset.UtcNow.AddSeconds(30);
+
+            _sessionTimer = new Timer(_ => _ = SessionTimerAsync(), null, when, TimeSpan.FromMilliseconds(-1));
         }
 
-        public SmiteClient(SmiteClientConfig config)
+        private async Task SessionTimerAsync()
         {
-            Config = config;
-            _client = new RestClient(this);
+            await InternalSessionInvalidatedAsync().ConfigureAwait(false);
+
+            if (_config.AutomaticallyRecreateSessions)
+            {
+                var newSession = await _restClient
+                    .SendAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+
+                _currentSession = newSession;
+
+                var time = DateTimeOffset.ParseExact(_currentSession.timestamp, "yyyyMMddHHmmss",
+                CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+
+                var when = time - DateTimeOffset.UtcNow.AddSeconds(30);
+
+                _sessionTimer.Change(when, TimeSpan.FromMilliseconds(-1));
+            }
+        }
+
+        public async Task<string> PingAsync()
+        {
+            var response = await _restClient.PingAsync().ConfigureAwait(false);
+
+            return response;
         }
     }
 }

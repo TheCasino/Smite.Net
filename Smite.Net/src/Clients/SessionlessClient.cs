@@ -1,27 +1,37 @@
 ﻿using System.Threading.Tasks;
 
-namespace Smite.Net.Clients
+namespace Smite.Net
 {
-    public sealed class SessionlessClient
+    public sealed class SessionlessClient : ISmiteClient
     {
-        private readonly string _devKey;
+        private readonly SmiteClientConfig _config;
+        private readonly RestClient _restClient;
 
-        public SessionlessClient(string devKey)
+        public SessionlessClient(string devId, string authKey) : this(new SmiteClientConfig(devId, authKey))
         {
-            _devKey = devKey;
         }
 
-        public static async Task<SmiteClient> CreateAsync(string devKey)
+        public SessionlessClient(SmiteClientConfig config)
         {
-            var authKey = "";
+            if (string.IsNullOrWhiteSpace(config.DevKey) || string.IsNullOrWhiteSpace(config.AuthKey))
+                throw new System.ArgumentNullException("DevKey and AuthKey must not be null or whitespace");
 
-            return new SmiteClient(devKey, authKey);
+            _config = config;
         }
 
-        public async Task<SmiteClient> CreateClientAsync()
+        public async Task<string> PingAsync()
         {
-            var client = await CreateAsync(_devKey).ConfigureAwait(false);
-            return client;
+            var response = await _restClient.PingAsync().ConfigureAwait(false);
+
+            return response;
+        }
+
+        public async Task<SmiteClient> CreateSessionAsync()
+        {
+            var sessionModel = await _restClient
+                .SendAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+
+            return new SmiteClient(_restClient, _config, sessionModel);
         }
     }
 }
