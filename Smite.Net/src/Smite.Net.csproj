@@ -6,19 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Clients\SmiteClient.Events.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Entities\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Clients\SmiteClient.Events.cs" />
   </ItemGroup>
 
 </Project>

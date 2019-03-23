@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Smite.Net
 {
-    internal class RestClient
+    internal class RestClient : IDisposable
     {
         private readonly SmiteClientConfig _config;
         private readonly HttpClient _httpClient;
@@ -30,13 +30,13 @@ namespace Smite.Net
         }
 
         public async Task<T> SendAsync<T>(Platform platform, string methodName, 
-            string sessionId, params string[] endPoints)
+            SessionModel session, params string[] endPoints)
         {
             await _semaphore.WaitAsync();
 
             var time = DateTimeOffset.UtcNow;
 
-            var url = UrlBuilder(platform, methodName, time, sessionId, endPoints);
+            var url = UrlBuilder(platform, methodName, time, session, endPoints);
 
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
 
@@ -53,7 +53,7 @@ namespace Smite.Net
         {
             await _semaphore.WaitAsync();
 
-            var url = string.Concat(_platforms[Platform.PC], Format);
+            var url = string.Concat(_platforms[Platform.PC], "/ping", Format);
 
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false); 
 
@@ -65,7 +65,7 @@ namespace Smite.Net
         }
 
         private string UrlBuilder(Platform platform, string methodName, 
-            DateTimeOffset time, string sessionId = null, params string[] endpoints)
+            DateTimeOffset time, SessionModel session, params string[] endpoints)
         {
             var sb = new StringBuilder();
 
@@ -75,17 +75,17 @@ namespace Smite.Net
             sb.Append(Format);
 
             sb.Append('/');
-            sb.Append(_config.DevKey);
+            sb.Append(_config.DevId);
 
-            var signature = CreateSignature(_config.DevKey, methodName, _config.AuthKey, time);
+            var signature = CreateSignature(_config.DevId, methodName, _config.AuthKey, time);
 
             sb.Append('/');
             sb.Append(signature);
 
-            if(!string.IsNullOrWhiteSpace(sessionId))
+            if(!(session is null))
             {
                 sb.Append('/');
-                sb.Append(sessionId);
+                sb.Append(session.session_id);
             }
 
             sb.Append('/');
@@ -109,7 +109,7 @@ namespace Smite.Net
 
             var sb = new StringBuilder();
 
-            for (int i = 0; i <= bytes.Length; i++)
+            for (int i = 0; i < bytes.Length; i++)
                 sb.Append(bytes[i].ToString("x2").ToLower());
 
             return sb.ToString();
@@ -121,5 +121,25 @@ namespace Smite.Net
             [Platform.Xbox] = APIDetails.XboxBaseUrl,
             [Platform.PS4]  = APIDetails.PS4BaseUrl
         };
+
+        private bool disposedValue = false;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _httpClient.Dispose();
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
     }
 }
