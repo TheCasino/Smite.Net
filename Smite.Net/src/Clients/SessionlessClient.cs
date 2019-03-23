@@ -38,7 +38,7 @@ namespace Smite.Net
         /// <returns>The response of the ping.</returns>
         public async Task<string> PingAsync()
         {
-            var response = await _restClient.PingAsync().ConfigureAwait(false);
+            var response = await _restClient.JsonlessMethodAsync("ping").ConfigureAwait(false);
 
             return response;
         }
@@ -50,7 +50,7 @@ namespace Smite.Net
         public async Task<SmiteClient> CreateSessionAsync()
         {
             var sessionModel = await _restClient
-                .SendAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+                .GetAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
 
             return new SmiteClient(_restClient, _config, sessionModel);
         }

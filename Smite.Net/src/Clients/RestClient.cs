@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Smite.Net
 {
-    internal class RestClient : IDisposable
+    public class RestClient : IDisposable
     {
         private readonly SmiteClientConfig _config;
         private readonly HttpClient _httpClient;
@@ -29,7 +29,7 @@ namespace Smite.Net
             _semaphore = new SemaphoreSlim(1);
         }
 
-        public async Task<T> SendAsync<T>(Platform platform, string methodName, 
+        public async Task<T> GetAsync<T>(Platform platform, string methodName, 
             SessionModel session, params string[] endPoints)
         {
             await _semaphore.WaitAsync();
@@ -38,22 +38,27 @@ namespace Smite.Net
 
             var url = UrlBuilder(platform, methodName, time, session, endPoints);
 
+            Console.WriteLine(url);
+
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
 
             //TODO error handling
 
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+            //for debug purposes
+            Console.WriteLine(data);
+
             _semaphore.Release();
 
             return JsonConvert.DeserializeObject<T>(data);
         }
 
-        public async Task<string> PingAsync()
+        public async Task<string> JsonlessMethodAsync(string methodName)
         {
             await _semaphore.WaitAsync();
 
-            var url = string.Concat(_platforms[Platform.PC], "/ping", Format);
+            var url = string.Concat(_platforms[Platform.PC], $"/{methodName}", Format);
 
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false); 
 

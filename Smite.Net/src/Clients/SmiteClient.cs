@@ -10,10 +10,10 @@ namespace Smite.Net
     /// </summary>
     public sealed partial class SmiteClient : ISmiteClient, IDisposable
     {
-        private readonly RestClient _restClient;
+        public readonly RestClient _restClient;
         private readonly SmiteClientConfig _config;
 
-        private SessionModel _currentSession;
+        public SessionModel _currentSession;
 
         private readonly Timer _sessionTimer;
 
@@ -81,7 +81,7 @@ namespace Smite.Net
             if (_config.AutomaticallyRecreateSessions)
             {
                 var newSession = await _restClient
-                    .SendAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+                    .GetAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
 
                 _currentSession = newSession;
 
