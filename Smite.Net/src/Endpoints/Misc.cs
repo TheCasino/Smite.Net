@@ -1,4 +1,5 @@
 ﻿using Smite.Net.ReadOnlyEntities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ namespace Smite.Net
         /// Pings the API.
         /// </summary>
         /// <returns>The response of the ping.</returns>
-        public async Task<string> PingAsync()
+        public override async Task<string> PingAsync()
         {
             var response = await _restClient.JsonlessMethodAsync("ping").ConfigureAwait(false);
 
@@ -36,7 +37,7 @@ namespace Smite.Net
         public async Task<DataUsed> GetDataUsedAsync()
         {
             var response = await _restClient
-                .GetAsync<DataUsedModel>(Platform.PC, "getdataused", _currentSession).ConfigureAwait(false);
+                .GetAsync<DataUsedModel>(APIPlatform.PC, "getdataused", _currentSession).ConfigureAwait(false);
 
             return new DataUsed(response);
         }
@@ -45,31 +46,32 @@ namespace Smite.Net
         /// Gets the statuses of the servers.
         /// </summary>
         /// <returns>A dictionary of the server status of each platform.</returns>
-        public async Task<IReadOnlyDictionary<Platform, ServerStatus>> GetServerStatusesAsync()
+        public async Task<IReadOnlyDictionary<APIPlatform, ServerStatus>> GetServerStatusesAsync()
         {
             var response = await _restClient
-                .GetAsync<ServerStatusModel[]>(Platform.PC, "gethirezserverstatus", _currentSession)
+                .GetAsync<ServerStatusModel[]>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
                 .ConfigureAwait(false);
 
-            Platform GetPlatform(string input)
+            APIPlatform GetPlatform(string input)
             {
                 switch(input)
                 {
                     case "xbox":
-                        return Platform.Xbox;
+                        return APIPlatform.Xbox;
 
                     case "ps4":
-                        return Platform.PS4;
+                        return APIPlatform.PS4;
 
                     case "pc":
-                    default:
-                        return Platform.PC;
+                        return APIPlatform.PC;
                 }
+
+                throw new ArgumentException("Unkown platform type.");
             }
 
             var dict = response.ToDictionary(x => GetPlatform(x.platform), x => new ServerStatus(x));
 
-            return new ReadOnlyDictionary<Platform, ServerStatus>(dict);
+            return new ReadOnlyDictionary<APIPlatform, ServerStatus>(dict);
         }
 
         /// <summary>
@@ -78,7 +80,7 @@ namespace Smite.Net
         /// <returns>The current patch number.</returns>
         public async Task<string> GetPatchNumberAsync()
         {
-            var response = await _restClient.GetAsync<PatchInfoModel>(Platform.PC, "getpatchinfo", _currentSession)
+            var response = await _restClient.GetAsync<PatchInfoModel>(APIPlatform.PC, "getpatchinfo", _currentSession)
                 .ConfigureAwait(false);
 
             return response.version_string;

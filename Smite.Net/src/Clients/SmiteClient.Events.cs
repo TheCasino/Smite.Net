@@ -14,15 +14,5 @@ namespace Smite.Net
         {
             return SessionInvalidated is null ? Task.CompletedTask : SessionInvalidated.Invoke();
         }
-
-        /// <summary>
-        /// Fires when a new log message is raised.
-        /// </summary>
-        public Func<string, Task> Log;
-
-        internal Task InternalLogAsync(string message)
-        {
-            return Log is null ? Task.CompletedTask : Log.Invoke(message);
-        }
     }
 }

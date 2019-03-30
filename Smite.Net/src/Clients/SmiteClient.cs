@@ -8,7 +8,7 @@ namespace Smite.Net
     /// <summary>
     /// A client with a valid session.
     /// </summary>
-    public sealed partial class SmiteClient : ISmiteClient, IDisposable
+    public sealed partial class SmiteClient : BaseSmiteClient, IDisposable
     {
         public readonly RestClient _restClient;
         private readonly SmiteClientConfig _config;
@@ -36,6 +36,7 @@ namespace Smite.Net
         internal SmiteClient(RestClient rest, SmiteClientConfig config, SessionModel session)
         {
             _restClient = rest;
+            _restClient.BaseClient = this;
             _config = config;
             _currentSession = session;
 
@@ -81,7 +82,7 @@ namespace Smite.Net
             if (_config.AutomaticallyRecreateSessions)
             {
                 var newSession = await _restClient
-                    .GetAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
 
                 _currentSession = newSession;
 

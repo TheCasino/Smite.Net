@@ -5,7 +5,7 @@ namespace Smite.Net
     /// <summary>
     /// A sessionless client.
     /// </summary>
-    public sealed class SessionlessClient : ISmiteClient
+    public sealed class SessionlessClient : BaseSmiteClient
     {
         private readonly SmiteClientConfig _config;
         private readonly RestClient _restClient;
@@ -29,14 +29,14 @@ namespace Smite.Net
                 throw new System.ArgumentNullException("DevId and AuthKey must not be null or whitespace");
 
             _config = config;
-            _restClient = new RestClient(_config);
+            _restClient = new RestClient(_config, this);
         }
 
         /// <summary>
         /// Pings the API.
         /// </summary>
         /// <returns>The response of the ping.</returns>
-        public async Task<string> PingAsync()
+        public override async Task<string> PingAsync()
         {
             var response = await _restClient.JsonlessMethodAsync("ping").ConfigureAwait(false);
 
@@ -50,7 +50,7 @@ namespace Smite.Net
         public async Task<SmiteClient> CreateSessionAsync()
         {
             var sessionModel = await _restClient
-                .GetAsync<SessionModel>(Platform.PC, "createsession", null).ConfigureAwait(false);
+                .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
 
             return new SmiteClient(_restClient, _config, sessionModel);
         }

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -16,12 +17,16 @@ namespace Smite.Net
         private readonly HttpClient _httpClient;
         private readonly SemaphoreSlim _semaphore;
 
+        public BaseSmiteClient BaseClient;
+
         private const string Format = "Json";
         private const string TimeFormat = "yyyyMMddHHmmss";
 
-        public RestClient(SmiteClientConfig config)
+        public RestClient(SmiteClientConfig config, BaseSmiteClient baseClient)
         {
             _config = config;
+
+            BaseClient = baseClient;
 
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -29,8 +34,8 @@ namespace Smite.Net
             _semaphore = new SemaphoreSlim(1);
         }
 
-        public async Task<T> GetAsync<T>(Platform platform, string methodName, 
-            SessionModel session, params string[] endPoints)
+        public async Task<T> GetAsync<T>(APIPlatform platform, string methodName, 
+            SessionModel session, params object[] endPoints)
         {
             await _semaphore.WaitAsync();
 
@@ -38,14 +43,18 @@ namespace Smite.Net
 
             var url = UrlBuilder(platform, methodName, time, session, endPoints);
 
-            Console.WriteLine(url);
+            var sw = Stopwatch.StartNew();
 
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
+
+            sw.Stop();
 
             //TODO error handling
 
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
+            await BaseClient.InternalLogAsync($"GET/ {url} took {sw.ElapsedMilliseconds}ms");
+            
             //for debug purposes
             Console.WriteLine(data);
 
@@ -58,7 +67,7 @@ namespace Smite.Net
         {
             await _semaphore.WaitAsync();
 
-            var url = string.Concat(_platforms[Platform.PC], $"/{methodName}", Format);
+            var url = string.Concat(_platforms[APIPlatform.PC], $"/{methodName}", Format);
 
             using var response = await _httpClient.GetAsync(url).ConfigureAwait(false); 
 
@@ -69,8 +78,8 @@ namespace Smite.Net
             return data;
         }
 
-        private string UrlBuilder(Platform platform, string methodName, 
-            DateTimeOffset time, SessionModel session, params string[] endpoints)
+        private string UrlBuilder(APIPlatform platform, string methodName, 
+            DateTimeOffset time, SessionModel session, params object[] endpoints)
         {
             var sb = new StringBuilder();
 
@@ -120,11 +129,11 @@ namespace Smite.Net
             return sb.ToString();
         }
 
-        private static readonly Dictionary<Platform, string> _platforms = new Dictionary<Platform, string>
+        private static readonly Dictionary<APIPlatform, string> _platforms = new Dictionary<APIPlatform, string>
         {
-            [Platform.PC]   = APIDetails.PCBaseUrl,
-            [Platform.Xbox] = APIDetails.XboxBaseUrl,
-            [Platform.PS4]  = APIDetails.PS4BaseUrl
+            [APIPlatform.PC]   = APIDetails.PCBaseUrl,
+            [APIPlatform.Xbox] = APIDetails.XboxBaseUrl,
+            [APIPlatform.PS4]  = APIDetails.PS4BaseUrl
         };
 
         private bool disposedValue = false;
