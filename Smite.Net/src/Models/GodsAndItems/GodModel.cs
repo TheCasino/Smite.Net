@@ -77,7 +77,7 @@
         public string godIcon_URL { get; set; } //
         public string LatestGod { get; set; } //
 
-        public int Id { get; set; } //
+        public int id { get; set; } //
     }
 
     internal class AbilityModel

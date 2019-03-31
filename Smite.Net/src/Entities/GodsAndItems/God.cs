@@ -9,7 +9,7 @@ namespace Smite.Net
         /// <summary>
         /// The God's id.
         /// </summary>
-        public int Id => _model.Id;
+        public int Id => _model.id;
 
         private Uri _cardArtUrl;
 
