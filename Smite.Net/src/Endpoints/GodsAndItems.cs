@@ -62,5 +62,39 @@ namespace Smite.Net
             return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(x)), 
                 () => response.Length);
         }
+
+        /// <summary>
+        /// Gets the skins for the specified God.
+        /// </summary>
+        /// <param name="god">The God you want to fetch the skins for.</param>
+        /// <param name="language">The language to use.</param>
+        /// <returns>A collection of skins.</returns>
+        public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(God god, Language language = Language.English)
+        {
+            if (god is null)
+                throw new ArgumentNullException(nameof(god));
+
+            var entries = await GetSkinsAsync(god.Id, language).ConfigureAwait(false);
+
+            return entries;
+        }
+
+        /// <summary>
+        /// Gets the skins for ths specified God id.
+        /// </summary>
+        /// <param name="godId">The id of the God you want to get the skins for.</param>
+        /// <param name="language">The language to use.</param>
+        /// <returns>A collection of skins.</returns>
+        public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(int godId, Language language = Language.English)
+        {
+            if (godId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(godId));
+
+            var response = await _restClient
+                .GetAsync<GodSkinModel[]>(APIPlatform.PC, "getgodskins", _currentSession, godId, (int)language)
+                .ConfigureAwait(false);
+
+            return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(x)), () => response.Length);
+        }
     }
 }

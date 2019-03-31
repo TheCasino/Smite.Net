@@ -128,4 +128,11 @@
         ClashTutorial               = 471,
         BasicTutorial               = 436
     }
+
+    public enum Obtainability
+    {
+        Normal,
+        Exclusive,
+        Limited
+    }
 }
