@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,10 +40,11 @@ namespace Smite.Net
             _config = config;
             _currentSession = session;
 
-            var time = DateTimeOffset.Parse(_currentSession.timestamp,
-                    CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
+            var time = DateTime.Parse(_currentSession.timestamp,
+                    CultureInfo.InvariantCulture);
 
-            var when = time.AddMinutes(14).AddSeconds(30) - DateTimeOffset.UtcNow;
+
+            var when = time.AddMinutes(14).AddSeconds(30) - DateTime.UtcNow;
 
             _sessionTimer = new Timer(_ => _ = SessionTimerCallbackAsync(), null, when, TimeSpan.FromMilliseconds(-1));
         }
