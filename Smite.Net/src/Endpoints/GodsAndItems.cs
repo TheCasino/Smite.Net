@@ -96,5 +96,43 @@ namespace Smite.Net
 
             return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(x)), () => response.Length);
         }
+
+        /// <summary>
+        /// Gets the recommended items for this God.
+        /// </summary>
+        /// <param name="god">The God you want to fetch the items for.</param>
+        /// <param name="language">The language to use.</param>
+        /// <returns>A collection of recommended items.</returns>
+        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(God god, 
+            Language language = Language.English)
+        {
+            if (god is null)
+                throw new ArgumentNullException(nameof(god));
+
+            var items = await GetRecommendedItemsAsync(god.Id, language).ConfigureAwait(false);
+
+            return items;
+        }
+
+        /// <summary>
+        /// Gets the recommended items for the specified id.
+        /// </summary>
+        /// <param name="godId">The id of the God you want to fetch items for.</param>
+        /// <param name="language">The language to use.</param>
+        /// <returns>A collection of recommended items.</returns>
+        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(int godId,
+            Language language = Language.English)
+        {
+            if (godId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(godId));
+
+            var response = await _restClient
+                .GetAsync<RecommendedItemModel[]>(APIPlatform.PC, 
+                    "getgodrecommendeditems", _currentSession, godId, (int)language)
+                .ConfigureAwait(false);
+
+            return new ReadOnlyCollection<RecommendedItem>(
+                response.Select(x => new RecommendedItem(x)), () => response.Length);
+        }
     }
 }
