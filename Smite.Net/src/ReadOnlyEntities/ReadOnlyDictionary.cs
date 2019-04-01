@@ -5,9 +5,9 @@ namespace Smite.Net.ReadOnlyEntities
 {
     public sealed class ReadOnlyDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>
     {
-        private readonly Dictionary<TKey, TValue> _dict;
+        private readonly IDictionary<TKey, TValue> _dict;
 
-        internal ReadOnlyDictionary(Dictionary<TKey, TValue> dict)
+        internal ReadOnlyDictionary(IDictionary<TKey, TValue> dict)
         {
             _dict = dict;
         }
