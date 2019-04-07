@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smite.Net
@@ -15,8 +14,6 @@ namespace Smite.Net
 
         public SessionModel _currentSession;
 
-        private readonly Timer _sessionTimer;
-
         /// <summary>
         /// Whether the clients session is currently valid or not.
         /// </summary>
@@ -24,8 +21,9 @@ namespace Smite.Net
         {
             get
             {
-                var invalidated = DateTimeOffset.Parse(_currentSession.timestamp, 
-                    CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal).AddMinutes(15);
+                var invalidated = DateTimeOffset.ParseExact(_currentSession.timestamp,
+                    "M/d/yyyy H:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
+                    .AddMinutes(15);
 
                 var now = DateTimeOffset.UtcNow;
 
@@ -39,14 +37,24 @@ namespace Smite.Net
             _restClient.BaseClient = this;
             _config = config;
             _currentSession = session;
+        }
 
-            var time = DateTime.Parse(_currentSession.timestamp,
-                    CultureInfo.InvariantCulture);
+        internal async Task SessionRecreationAsync()
+        {
+            while (true)
+            {
+                var time = DateTimeOffset.ParseExact(_currentSession.timestamp, 
+                    "M/d/yyyy H:mm:ss tt", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
 
+                var toWait = time.AddMinutes(14).AddSeconds(45) - DateTimeOffset.UtcNow;
 
-            var when = time.AddMinutes(14).AddSeconds(30) - DateTime.UtcNow;
+                await Task.Delay(toWait).ConfigureAwait(false);
 
-            _sessionTimer = new Timer(_ => _ = SessionTimerCallbackAsync(), null, when, TimeSpan.FromMilliseconds(-1));
+                await InternalSessionInvalidatedAsync();
+
+                _currentSession = await _restClient
+                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -76,26 +84,6 @@ namespace Smite.Net
             return client;
         }
 
-        private async Task SessionTimerCallbackAsync()
-        {
-            await InternalSessionInvalidatedAsync().ConfigureAwait(false);
-
-            if (_config.AutomaticallyRecreateSessions)
-            {
-                var newSession = await _restClient
-                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
-
-                _currentSession = newSession;
-
-                var time = DateTimeOffset.Parse(_currentSession.timestamp, 
-                    CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
-
-                var when = time.AddMinutes(14).AddSeconds(30) - DateTimeOffset.UtcNow;
-
-                _sessionTimer.Change(when, TimeSpan.FromMilliseconds(-1));
-            }
-        }
-
         private bool disposedValue = false;
 
         void Dispose(bool disposing)
@@ -104,7 +92,6 @@ namespace Smite.Net
             {
                 if (disposing)
                 {
-                    _sessionTimer.Dispose();
                     _restClient.Dispose();
                 }
 
