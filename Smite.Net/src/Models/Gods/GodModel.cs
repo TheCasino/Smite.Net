@@ -91,22 +91,22 @@
 
     internal class AbilityDescriptionModel
     {
-        public ItemDescriptionModel itemDescription { get; set; }
+        public AbilityItemDescriptionModel itemDescription { get; set; }
     }
 
-    internal class ItemDescriptionModel
+    internal class AbilityItemDescriptionModel
     {
         public string cooldown { get; set; }
         public string cost { get; set; }
         public string description { get; set; }
 
-        public ItemModel[] menuitems { get; set; }
-        public ItemModel[] rankitems { get; set; }
+        public GodItemModel[] menuitems { get; set; }
+        public GodItemModel[] rankitems { get; set; }
 
         public string secondaryDescription { get; set; }
     }
 
-    internal class ItemModel
+    internal class GodItemModel
     {
         public string description { get; set; }
         public string value { get; set; }

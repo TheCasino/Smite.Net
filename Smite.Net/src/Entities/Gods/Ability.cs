@@ -53,7 +53,7 @@ namespace Smite.Net
             {
                 if(_abilityStats == default)
                 {
-                    var stats = new List<ItemModel>();
+                    var stats = new List<GodItemModel>();
                     stats.AddRange(_model.Description.itemDescription.menuitems);
                     stats.AddRange(_model.Description.itemDescription.rankitems);
 

@@ -134,5 +134,20 @@ namespace Smite.Net
             return new ReadOnlyCollection<RecommendedItem>(
                 response.Select(x => new RecommendedItem(x)), () => response.Length);
         }
+
+        /// <summary>
+        /// Gets all the items in the game.
+        /// </summary>
+        /// <param name="language">The language to use.</param>
+        /// <returns>A collection of items.</returns>
+        public async Task<IReadOnlyCollection<Item>> GetItemsAsync(Language language = Language.English)
+        {
+            var resp = await _restClient
+                .GetAsync<ItemModel[]>(APIPlatform.PC, "getitems", _currentSession, (int)language)
+                .ConfigureAwait(false);
+
+            return new ReadOnlyCollection<Item>(
+                resp.Select(x => new Item(x)), () => resp.Length);
+        }
     }
 }

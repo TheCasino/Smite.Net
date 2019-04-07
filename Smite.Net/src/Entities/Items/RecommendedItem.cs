@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class RecommendedItem
+    public sealed class RecommendedItem : IItem
     {
         private readonly RecommendedItemModel _model;
 
@@ -37,6 +37,11 @@ namespace Smite.Net
                 throw new ArgumentException($"Unknown Category type {_model.Category}.");
             }
         }
+
+        /// <summary>
+        /// Gets whether this is a starter item or not.
+        /// </summary>
+        public bool IsStarterItem => Category == ItemCategory.Starter;
 
         /// <summary>
         /// The name of the item.
@@ -92,7 +97,7 @@ namespace Smite.Net
         /// <summary>
         /// The id of the item.
         /// </summary>
-        public int ItemId => _model.item_id;
+        public int Id => _model.item_id;
 
         /// <summary>
         /// The id of the role.
