@@ -50,10 +50,10 @@ namespace Smite.Net
 
                 await Task.Delay(toWait).ConfigureAwait(false);
 
-                await InternalSessionInvalidatedAsync();
-
                 _currentSession = await _restClient
                     .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
+
+                await InternalSessionInvalidatedAsync().ConfigureAwait(false);
             }
         }
 
