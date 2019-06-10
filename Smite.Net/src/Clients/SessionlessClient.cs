@@ -52,7 +52,7 @@ namespace Smite.Net
             var sessionModel = await _restClient
                 .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
 
-            var client = new SmiteClient(_restClient, _config, sessionModel);
+            var client = new SmiteClient(_restClient, sessionModel);
 
             if (_config.AutomaticallyRecreateSessions)
                  _ = Task.Run(() => client.SessionRecreationAsync());

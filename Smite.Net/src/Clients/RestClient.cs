@@ -53,9 +53,8 @@ namespace Smite.Net
 
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            await BaseClient.InternalLogAsync($"GET/ {url} took {sw.ElapsedMilliseconds}ms");
-            
-            //for debug purposes
+            await BaseClient.InternalLogAsync($"GET/ {url} took {sw.ElapsedMilliseconds}ms").ConfigureAwait(false);
+
             Console.WriteLine(data);
 
             _semaphore.Release();
