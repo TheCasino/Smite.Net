@@ -8,7 +8,7 @@ namespace Smite.Net
         /// <summary>
         /// Fires when your current session has been invalidated.
         /// </summary>
-        public Func<Task> SessionInvalidated;
+        public event Func<Task> SessionInvalidated;
 
         internal Task InternalSessionInvalidatedAsync()
         {

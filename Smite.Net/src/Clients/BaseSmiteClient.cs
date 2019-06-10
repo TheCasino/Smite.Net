@@ -14,7 +14,7 @@ namespace Smite.Net
         /// <summary>
         /// Fires when a new log message is raised.
         /// </summary>
-        public Func<string, Task> Log;
+        public event Func<string, Task> Log;
 
         internal Task InternalLogAsync(string message)
         {
