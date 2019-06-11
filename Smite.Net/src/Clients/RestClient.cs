@@ -106,6 +106,9 @@ namespace Smite.Net
 
             foreach(var endpoint in endpoints)
             {
+                if (endpoint is null)
+                    continue;
+
                 sb.Append('/');
                 sb.Append(endpoint);
             }

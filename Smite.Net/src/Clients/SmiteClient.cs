@@ -1,5 +1,4 @@
 using System;
-using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Smite.Net
@@ -13,8 +12,6 @@ namespace Smite.Net
 
         public SessionModel _currentSession;
 
-        private const string TimeFormat = "M/d/yyyy H:mm:ss tt";
-
         /// <summary>
         /// Whether the clients session is currently valid or not.
         /// </summary>
@@ -22,8 +19,7 @@ namespace Smite.Net
         {
             get
             {
-                var invalidated = DateTimeOffset.ParseExact(_currentSession.timestamp,
-                    TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
+                var invalidated = Utils.ParseTime(_currentSession.timestamp)
                     .AddMinutes(15);
 
                 var now = DateTimeOffset.UtcNow;
@@ -43,8 +39,7 @@ namespace Smite.Net
         {
             while (true)
             {
-                var time = DateTimeOffset.ParseExact(_currentSession.timestamp, 
-                    TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+                var time = Utils.ParseTime(_currentSession.timestamp);
 
                 var toWait = time.AddMinutes(14).AddSeconds(45) - DateTimeOffset.UtcNow;
 
