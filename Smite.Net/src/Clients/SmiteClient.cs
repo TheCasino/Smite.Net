@@ -36,14 +36,24 @@ namespace Smite.Net
             if (_currentSession != null)
                 return;
 
-            _currentSession = await GetAsync<SessionModel>(APIPlatform.PC, "createsession")
+            _currentSession = await _restClient
+                .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
                 .ConfigureAwait(false);
+
+            if (_currentSession.ret_msg != "Approved")
+                throw new InvalidSessionException(_currentSession.ret_msg);
 
             _ = SessionTimerAsync();
         }
 
-        internal Task<T> GetAsync<T>(APIPlatform platform, string method, params object[] endpoints)
-            => _restClient.GetAsync<T>(platform, method, _currentSession, endpoints);
+        internal async Task<T> GetAsync<T>(APIPlatform platform, string method, params object[] endpoints)
+        {
+            if (_currentSession is null)
+                throw new InvalidSessionException();
+
+            var res = await _restClient.GetAsync<T>(platform, method, _currentSession, endpoints).ConfigureAwait(false);
+            return res;
+        }
 
         private async Task SessionTimerAsync()
         {
