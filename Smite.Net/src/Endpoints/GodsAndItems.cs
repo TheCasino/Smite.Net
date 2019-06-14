@@ -15,7 +15,7 @@ namespace Smite.Net
         /// <returns>A collection of God's</returns>
         public async Task<IReadOnlyCollection<God>> GetGodsAsync(Language language = Language.English)
         {
-            var response = await GetAsync<GodModel[]>(APIPlatform.PC, "getgods", _currentSession, (int)language)
+            var response = await GetCollectionAsync<GodModel>(APIPlatform.PC, "getgods", _currentSession, (int)language)
                 .ConfigureAwait(false);
 
             var gods = response.Select(x => new God(x));
@@ -55,7 +55,7 @@ namespace Smite.Net
                 throw new ArgumentOutOfRangeException(nameof(gamemode),
                     "GameMode must be either ConquestRanked, Duel, or JoustRanked.");
 
-            var response = await GetAsync<LeaderboardEntryModel[]>(APIPlatform.PC,
+            var response = await GetCollectionAsync<LeaderboardEntryModel>(APIPlatform.PC,
                     "getgodleaderboard", godId, (int)gamemode).ConfigureAwait(false);
 
             return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(x)),
@@ -89,7 +89,7 @@ namespace Smite.Net
             if (godId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(godId));
 
-            var response = await GetAsync<GodSkinModel[]>(APIPlatform.PC,
+            var response = await GetCollectionAsync<GodSkinModel>(APIPlatform.PC,
                 "getgodskins", godId, (int)language)
                 .ConfigureAwait(false);
 
@@ -125,7 +125,7 @@ namespace Smite.Net
             if (godId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(godId));
 
-            var response = await GetAsync<RecommendedItemModel[]>(APIPlatform.PC,
+            var response = await GetCollectionAsync<RecommendedItemModel>(APIPlatform.PC,
                     "getgodrecommendeditems", godId, (int)language)
                 .ConfigureAwait(false);
 
@@ -140,7 +140,7 @@ namespace Smite.Net
         /// <returns>A collection of items.</returns>
         public async Task<IReadOnlyCollection<Item>> GetItemsAsync(Language language = Language.English)
         {
-            var resp = await GetAsync<ItemModel[]>(APIPlatform.PC, "getitems", (int)language)
+            var resp = await GetCollectionAsync<ItemModel>(APIPlatform.PC, "getitems", (int)language)
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<Item>(

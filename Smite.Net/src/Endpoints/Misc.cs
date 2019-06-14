@@ -47,7 +47,7 @@ namespace Smite.Net
         /// <returns>A dictionary of the server status of each platform.</returns>
         public async Task<IReadOnlyDictionary<APIPlatform, ServerStatus>> GetServerStatusesAsync()
         {
-            var response = await GetAsync<ServerStatusModel[]>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
+            var response = await GetCollectionAsync<ServerStatusModel>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
                 .ConfigureAwait(false);
 
             static APIPlatform GetPlatform(string input)
