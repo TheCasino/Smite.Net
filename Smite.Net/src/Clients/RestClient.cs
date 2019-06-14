@@ -13,20 +13,22 @@ namespace Smite.Net
 {
     public class RestClient : IDisposable
     {
-        private readonly SmiteClientConfig _config;
+        private readonly string _authKey;
+        private readonly int _devId;
         private readonly HttpClient _httpClient;
         private readonly SemaphoreSlim _semaphore;
 
-        public BaseSmiteClient BaseClient;
+        public SmiteClient _smiteClient;
 
         private const string Format = "Json";
         private const string TimeFormat = "yyyyMMddHHmmss";
 
-        public RestClient(SmiteClientConfig config, BaseSmiteClient baseClient)
+        public RestClient(int devId, string authKey, SmiteClient client)
         {
-            _config = config;
+            _devId = devId;
+            _authKey = authKey;
 
-            BaseClient = baseClient;
+            _smiteClient = client;
 
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -53,7 +55,7 @@ namespace Smite.Net
 
             var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            await BaseClient.InternalLogAsync($"GET/ {url} took {sw.ElapsedMilliseconds}ms").ConfigureAwait(false);
+            await _smiteClient.InternalLogAsync($"GET/ {url} took {sw.ElapsedMilliseconds}ms").ConfigureAwait(false);
 
             Console.WriteLine(data);
 
@@ -88,14 +90,14 @@ namespace Smite.Net
             sb.Append(Format);
 
             sb.Append('/');
-            sb.Append(_config.DevId);
+            sb.Append(_devId);
 
-            var signature = CreateSignature(_config.DevId, methodName, _config.AuthKey, time);
+            var signature = CreateSignature(methodName, time);
 
             sb.Append('/');
             sb.Append(signature);
 
-            if(!(session is null))
+            if(session != null)
             {
                 sb.Append('/');
                 sb.Append(session.session_id);
@@ -116,10 +118,10 @@ namespace Smite.Net
             return sb.ToString();
         }
 
-        private static string CreateSignature(string devKey, string methodName, string authKey, DateTimeOffset time)
+        private string CreateSignature(string methodName, DateTimeOffset time)
         {
             var md5 = new MD5CryptoServiceProvider();
-            var bytes = Encoding.UTF8.GetBytes($"{devKey}{methodName}{authKey}{time.ToString(TimeFormat)}");
+            var bytes = Encoding.UTF8.GetBytes($"{_devId}{methodName}{_authKey}{time.ToString(TimeFormat)}");
 
             bytes = md5.ComputeHash(bytes);
 

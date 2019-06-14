@@ -12,7 +12,7 @@ namespace Smite.Net
         /// Pings the API.
         /// </summary>
         /// <returns>The response of the ping.</returns>
-        public override async Task<string> PingAsync()
+        public async Task<string> PingAsync()
         {
             var response = await _restClient.JsonlessMethodAsync("ping").ConfigureAwait(false);
 
@@ -36,8 +36,7 @@ namespace Smite.Net
         /// <returns>Your current usage data.</returns>
         public async Task<DataUsed> GetDataUsedAsync()
         {
-            var response = await _restClient
-                .GetAsync<DataUsedModel>(APIPlatform.PC, "getdataused", _currentSession).ConfigureAwait(false);
+            var response = await GetAsync<DataUsedModel>(APIPlatform.PC, "getdataused").ConfigureAwait(false);
 
             return new DataUsed(response);
         }
@@ -48,11 +47,10 @@ namespace Smite.Net
         /// <returns>A dictionary of the server status of each platform.</returns>
         public async Task<IReadOnlyDictionary<APIPlatform, ServerStatus>> GetServerStatusesAsync()
         {
-            var response = await _restClient
-                .GetAsync<ServerStatusModel[]>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
+            var response = await GetAsync<ServerStatusModel[]>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
                 .ConfigureAwait(false);
 
-            APIPlatform GetPlatform(string input)
+            static APIPlatform GetPlatform(string input)
             {
                 switch(input)
                 {
@@ -80,7 +78,7 @@ namespace Smite.Net
         /// <returns>The current patch number.</returns>
         public async Task<string> GetPatchNumberAsync()
         {
-            var response = await _restClient.GetAsync<PatchInfoModel>(APIPlatform.PC, "getpatchinfo", _currentSession)
+            var response = await GetAsync<PatchInfoModel>(APIPlatform.PC, "getpatchinfo", _currentSession)
                 .ConfigureAwait(false);
 
             return response.version_string;

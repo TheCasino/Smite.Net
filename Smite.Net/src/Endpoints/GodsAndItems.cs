@@ -15,8 +15,7 @@ namespace Smite.Net
         /// <returns>A collection of God's</returns>
         public async Task<IReadOnlyCollection<God>> GetGodsAsync(Language language = Language.English)
         {
-            var response = await _restClient
-                .GetAsync<GodModel[]>(APIPlatform.PC, "getgods", _currentSession, (int)language)
+            var response = await GetAsync<GodModel[]>(APIPlatform.PC, "getgods", _currentSession, (int)language)
                 .ConfigureAwait(false);
 
             var gods = response.Select(x => new God(x));
@@ -51,15 +50,15 @@ namespace Smite.Net
             if (godId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(godId));
 
-            if (!(gamemode == GameMode.ConquestRanked || gamemode == GameMode.Duel || gamemode == GameMode.JoustRanked))
+            if (!(gamemode == GameMode.ConquestRanked || gamemode == GameMode.Duel
+                || gamemode == GameMode.JoustRanked))
                 throw new ArgumentOutOfRangeException(nameof(gamemode),
                     "GameMode must be either ConquestRanked, Duel, or JoustRanked.");
 
-            var response = await _restClient
-                .GetAsync<LeaderboardEntryModel[]>(APIPlatform.PC,
-                    "getgodleaderboard", _currentSession, godId, (int)gamemode).ConfigureAwait(false);
+            var response = await GetAsync<LeaderboardEntryModel[]>(APIPlatform.PC,
+                    "getgodleaderboard", godId, (int)gamemode).ConfigureAwait(false);
 
-            return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(x)), 
+            return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(x)),
                 () => response.Length);
         }
 
@@ -90,8 +89,8 @@ namespace Smite.Net
             if (godId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(godId));
 
-            var response = await _restClient
-                .GetAsync<GodSkinModel[]>(APIPlatform.PC, "getgodskins", _currentSession, godId, (int)language)
+            var response = await GetAsync<GodSkinModel[]>(APIPlatform.PC,
+                "getgodskins", godId, (int)language)
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(x)), () => response.Length);
@@ -103,7 +102,7 @@ namespace Smite.Net
         /// <param name="god">The God you want to fetch the items for.</param>
         /// <param name="language">The language to use.</param>
         /// <returns>A collection of recommended items.</returns>
-        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(God god, 
+        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(God god,
             Language language = Language.English)
         {
             if (god is null)
@@ -126,9 +125,8 @@ namespace Smite.Net
             if (godId <= 0)
                 throw new ArgumentOutOfRangeException(nameof(godId));
 
-            var response = await _restClient
-                .GetAsync<RecommendedItemModel[]>(APIPlatform.PC, 
-                    "getgodrecommendeditems", _currentSession, godId, (int)language)
+            var response = await GetAsync<RecommendedItemModel[]>(APIPlatform.PC,
+                    "getgodrecommendeditems", godId, (int)language)
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<RecommendedItem>(
@@ -142,8 +140,7 @@ namespace Smite.Net
         /// <returns>A collection of items.</returns>
         public async Task<IReadOnlyCollection<Item>> GetItemsAsync(Language language = Language.English)
         {
-            var resp = await _restClient
-                .GetAsync<ItemModel[]>(APIPlatform.PC, "getitems", _currentSession, (int)language)
+            var resp = await GetAsync<ItemModel[]>(APIPlatform.PC, "getitems", (int)language)
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<Item>(

@@ -1,105 +1,92 @@
-using System;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Smite.Net
 {
     /// <summary>
-    /// A client with a valid session.
+    /// The client that's used to interact with the API.
     /// </summary>
-    public sealed partial class SmiteClient : BaseSmiteClient, IDisposable
+    public sealed partial class SmiteClient : IDisposable
     {
-        public readonly RestClient _restClient;
+        private readonly CancellationTokenSource _cts;
+        public readonly RestClient _restClient; //public for testing
 
-        public SessionModel _currentSession;
-
-        /// <summary>
-        /// Whether the clients session is currently valid or not.
-        /// </summary>
-        public bool ValidSession
+        public SessionModel _currentSession; //public for testing
+        
+        public SmiteClient(int devId, string authKey)
         {
-            get
-            {
-                var invalidated = Utils.ParseTime(_currentSession.timestamp)
-                    .AddMinutes(15);
+            if (string.IsNullOrWhiteSpace(authKey))
+                throw new ArgumentNullException(nameof(authKey));
 
-                var now = DateTimeOffset.UtcNow;
-
-                return invalidated - now < TimeSpan.FromMinutes(15);
-            }
+            _cts = new CancellationTokenSource();
+            _restClient = new RestClient(devId, authKey, this);
         }
 
-        internal SmiteClient(RestClient rest, SessionModel session)
+        public event Func<string, Task> Log;
+
+        internal async Task InternalLogAsync(string log)
         {
-            _restClient = rest;
-            _restClient.BaseClient = this;
-            _currentSession = session;
+            if (Log != null)
+                await Log(log);
         }
 
-        internal async Task SessionRecreationAsync()
+        public async Task StartAsync()
         {
-            while (true)
+            if (_currentSession != null)
+                return;
+
+            _currentSession = await GetAsync<SessionModel>(APIPlatform.PC, "createsession")
+                .ConfigureAwait(false);
+
+            _ = SessionTimerAsync();
+        }
+
+        internal Task<T> GetAsync<T>(APIPlatform platform, string method, params object[] endpoints)
+            => _restClient.GetAsync<T>(platform, method, _currentSession, endpoints);
+
+        private async Task SessionTimerAsync()
+        {
+            while(true)
             {
                 var time = Utils.ParseTime(_currentSession.timestamp);
-
                 var toWait = time.AddMinutes(14).AddSeconds(45) - DateTimeOffset.UtcNow;
 
-                await Task.Delay(toWait).ConfigureAwait(false);
-
-                _currentSession = await _restClient
-                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null).ConfigureAwait(false);
-
-                await InternalSessionInvalidatedAsync().ConfigureAwait(false);
-            }
-        }
-
-        /// <summary>
-        /// Initialises a session and creates a client.
-        /// </summary>
-        /// <param name="config">The config to use for the client.</param>
-        /// <returns>A sessioned client.</returns>
-        public static async Task<SmiteClient> CreateClientAsync(SmiteClientConfig config)
-        {
-            var client = await new SessionlessClient(config).CreateSessionAsync().ConfigureAwait(false);
-
-            return client;
-        }
-
-        /// <summary>
-        /// Initialises a session and creates a client.
-        /// </summary>
-        /// <param name="devId">Your dev id.</param>
-        /// <param name="authKey">Your auth key.</param>
-        /// <returns>A sessioned client.</returns>
-        public static async Task<SmiteClient> CreateClientAsync(string devId, string authKey)
-        {
-            var config = new SmiteClientConfig(devId, authKey);
-
-            var client = await CreateClientAsync(config).ConfigureAwait(false);
-
-            return client;
-        }
-
-        private bool disposedValue = false;
-
-        void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
+                try
                 {
-                    _restClient.Dispose();
+                    await Task.Delay(toWait, _cts.Token).ConfigureAwait(false);
+                }
+                catch(TaskCanceledException)
+                {
+                    break;
                 }
 
-                disposedValue = true;
+                _currentSession = await _restClient
+                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
+                    .ConfigureAwait(false);
             }
         }
+
+        private bool _disposed;
 
         /// <summary>
         /// Disposes of the client.
         /// </summary>
         public void Dispose()
+            => Dispose(true);
+
+        private void Dispose(bool disposing)
         {
-            Dispose(true);
+            if (_disposed)
+                return;
+
+            if(disposing)
+            {
+                _cts.Cancel(true);
+                _cts.Dispose();
+                _restClient.Dispose();
+                _disposed = true;
+            }
         }
     }
 }
