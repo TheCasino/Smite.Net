@@ -9,18 +9,28 @@ namespace Smite.Net
     /// </summary>
     public sealed partial class SmiteClient : IDisposable
     {
+        private string _sessionId;
         private readonly CancellationTokenSource _cts;
         public readonly RestClient _restClient; //public for testing
 
         public SessionModel _currentSession; //public for testing
-        
-        public SmiteClient(int devId, string authKey)
+
+        public string SessionId => _sessionId ?? _currentSession.session_id;
+        public DateTimeOffset? SessionCreated => _currentSession is null 
+            ? (DateTimeOffset?)null : Utils.ParseTime(_currentSession.timestamp);
+
+        public SmiteClient(int devId, string authKey) : this(devId, authKey, null)
+        {
+        }
+
+        public SmiteClient(int devId, string authKey, string sessionId)
         {
             if (string.IsNullOrWhiteSpace(authKey))
                 throw new ArgumentNullException(nameof(authKey));
 
             _cts = new CancellationTokenSource();
             _restClient = new RestClient(devId, authKey, this);
+            _sessionId = sessionId;
         }
 
         public event Func<string, Task> Log;
@@ -31,19 +41,35 @@ namespace Smite.Net
                 await Log(log);
         }
 
-        public async Task StartAsync()
+        public async Task StartAsync(TimeSpan? revalidateAfter = null)
         {
             if (_currentSession != null)
                 return;
 
-            _currentSession = await _restClient
-                .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
-                .ConfigureAwait(false);
+            if (_sessionId != null)
+            {
+                if (revalidateAfter is null)
+                    throw new ArgumentNullException(nameof(revalidateAfter),
+                        "When passing a session on creation this parameter needs to specified as to when the session expires");
 
-            if (_currentSession.ret_msg != "Approved")
-                throw new InvalidSessionException(_currentSession.ret_msg);
+                var test = await TestSessionAsync();
 
-            _ = SessionTimerAsync();
+                if (test.IndexOf("Invalid") != -1)
+                    throw new InvalidSessionException(test);
+
+                _ = SessionTimerAsync(revalidateAfter.Value);
+            }
+            else
+            {
+                _currentSession = await _restClient
+                    .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
+                    .ConfigureAwait(false);
+
+                if (_currentSession.ret_msg != "Approved")
+                    throw new InvalidSessionException(_currentSession.ret_msg);
+
+                _ = SessionTimerAsync(null);
+            }
         }
 
         internal async Task<T> GetAsync<T>(APIPlatform platform, string method, params object[] endpoints) where T : BaseModel
@@ -51,7 +77,8 @@ namespace Smite.Net
             if (_currentSession is null)
                 throw new InvalidSessionException();
 
-            var res = await _restClient.GetAsync<T>(platform, method, _currentSession, endpoints).ConfigureAwait(false);
+            var res = await _restClient.GetAsync<T>(platform, method, SessionId, endpoints)
+                .ConfigureAwait(false);
 
             if (res.ret_msg != null)
                 throw new APIException(res.ret_msg);
@@ -64,9 +91,10 @@ namespace Smite.Net
             if (_currentSession is null)
                 throw new InvalidSessionException();
 
-            var res = await _restClient.GetAsync<T[]>(platform, method, _currentSession, endpoints).ConfigureAwait(false);
+            var res = await _restClient.GetAsync<T[]>(platform, method, SessionId, endpoints)
+                .ConfigureAwait(false);
 
-            for(int i = 0; i < res.Length; i++)
+            for (int i = 0; i < res.Length; i++)
             {
                 var ret = res[i].ret_msg;
 
@@ -77,18 +105,21 @@ namespace Smite.Net
             return res;
         }
 
-        private async Task SessionTimerAsync()
+        private async Task SessionTimerAsync(TimeSpan? toWait = null)
         {
-            while(true)
+            while (true)
             {
-                var time = Utils.ParseTime(_currentSession.timestamp);
-                var toWait = time.AddMinutes(14).AddSeconds(45) - DateTimeOffset.UtcNow;
+                if (toWait is null)
+                {
+                    var time = Utils.ParseTime(_currentSession.timestamp);
+                    toWait = time.AddMinutes(14).AddSeconds(45) - DateTimeOffset.UtcNow;
+                }
 
                 try
                 {
-                    await Task.Delay(toWait, _cts.Token).ConfigureAwait(false);
+                    await Task.Delay(toWait.Value, _cts.Token).ConfigureAwait(false);
                 }
-                catch(TaskCanceledException)
+                catch (TaskCanceledException)
                 {
                     break;
                 }
@@ -96,6 +127,9 @@ namespace Smite.Net
                 _currentSession = await _restClient
                     .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
                     .ConfigureAwait(false);
+
+                if (_sessionId != null)
+                    _sessionId = null;
             }
         }
 
@@ -112,7 +146,7 @@ namespace Smite.Net
             if (_disposed)
                 return;
 
-            if(disposing)
+            if (disposing)
             {
                 _cts.Cancel(true);
                 _cts.Dispose();

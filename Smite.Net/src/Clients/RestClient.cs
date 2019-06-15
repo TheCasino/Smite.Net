@@ -17,8 +17,7 @@ namespace Smite.Net
         private readonly int _devId;
         private readonly HttpClient _httpClient;
         private readonly SemaphoreSlim _semaphore;
-
-        public SmiteClient _smiteClient;
+        private readonly SmiteClient _smiteClient;
 
         private const string Format = "Json";
         private const string TimeFormat = "yyyyMMddHHmmss";
@@ -37,13 +36,13 @@ namespace Smite.Net
         }
 
         public async Task<T> GetAsync<T>(APIPlatform platform, string methodName, 
-            SessionModel session, params object[] endPoints)
+            string sessionId, params object[] endPoints) where T : class
         {
             await _semaphore.WaitAsync();
 
             var time = DateTimeOffset.UtcNow;
 
-            var url = UrlBuilder(platform, methodName, time, session, endPoints);
+            var url = UrlBuilder(platform, methodName, time, sessionId, endPoints);
 
             var sw = Stopwatch.StartNew();
 
@@ -61,26 +60,14 @@ namespace Smite.Net
 
             _semaphore.Release();
 
+            if (typeof(T) == typeof(string))
+                return data as T;
+
             return JsonConvert.DeserializeObject<T>(data);
         }
 
-        public async Task<string> JsonlessMethodAsync(string methodName)
-        {
-            await _semaphore.WaitAsync();
-
-            var url = string.Concat(_platforms[APIPlatform.PC], $"/{methodName}", Format);
-
-            using var response = await _httpClient.GetAsync(url).ConfigureAwait(false); 
-
-            var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            _semaphore.Release();
-
-            return data;
-        }
-
         private string UrlBuilder(APIPlatform platform, string methodName, 
-            DateTimeOffset time, SessionModel session, params object[] endpoints)
+            DateTimeOffset time, string sessionId, params object[] endpoints)
         {
             var sb = new StringBuilder();
 
@@ -97,10 +84,10 @@ namespace Smite.Net
             sb.Append('/');
             sb.Append(signature);
 
-            if(session != null)
+            if(sessionId != null)
             {
                 sb.Append('/');
-                sb.Append(session.session_id);
+                sb.Append(sessionId);
             }
 
             sb.Append('/');
