@@ -91,7 +91,7 @@ namespace Smite.Net
 
         internal async Task<T> GetAsync<T>(APIPlatform platform, string method, params object[] endpoints) where T : BaseModel
         {
-            if (_currentSession is null)
+            if (string.IsNullOrWhiteSpace(SessionId))
                 throw new InvalidSessionException();
 
             var res = await _restClient.GetAsync<T>(platform, method, SessionId, endpoints)
@@ -105,7 +105,7 @@ namespace Smite.Net
 
         internal async Task<T[]> GetCollectionAsync<T>(APIPlatform platform, string method, params object[] endpoints) where T : BaseModel
         {
-            if (_currentSession is null)
+            if (string.IsNullOrWhiteSpace(SessionId))
                 throw new InvalidSessionException();
 
             var res = await _restClient.GetAsync<T[]>(platform, method, SessionId, endpoints)
