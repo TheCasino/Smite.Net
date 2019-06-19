@@ -63,7 +63,15 @@ namespace Smite.Net
             if (typeof(T) == typeof(string))
                 return data as T;
 
-            return JsonConvert.DeserializeObject<T>(data);
+            try
+            {
+
+                return JsonConvert.DeserializeObject<T>(data);
+            }
+            catch(JsonReaderException)
+            {
+                throw new APIException($"Invalid endpoint: {url}");
+            }
         }
 
         private string UrlBuilder(APIPlatform platform, string methodName, 
