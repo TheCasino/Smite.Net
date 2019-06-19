@@ -23,7 +23,7 @@ namespace Smite.Net
         /// <summary>
         /// When the current session was created.
         /// </summary>
-        public DateTimeOffset? SessionCreated => _currentSession is null 
+        public DateTimeOffset? SessionCreatedAt => _currentSession is null 
             ? (DateTimeOffset?)null : Utils.ParseTime(_currentSession.timestamp);
 
         /// <summary>
@@ -49,19 +49,7 @@ namespace Smite.Net
             _cts = new CancellationTokenSource();
             _restClient = new RestClient(devId, authKey, this);
             _sessionId = sessionId;
-        }
-
-
-        /// <summary>
-        /// Event that fires whenever a new log is raised.
-        /// </summary>
-        public event Func<string, Task> Log;
-
-        internal async Task InternalLogAsync(string log)
-        {
-            if (Log != null)
-                await Log(log);
-        }
+        }        
 
         /// <summary>
         /// Starts the clients auto-session recreation.
@@ -94,6 +82,8 @@ namespace Smite.Net
 
                 if (_currentSession.ret_msg != "Approved")
                     throw new InvalidSessionException(_currentSession.ret_msg);
+
+                await InternalSessionCreatedAsync(SessionCreatedAt.Value, SessionId);
 
                 _ = SessionTimerAsync(null);
             }
@@ -154,6 +144,10 @@ namespace Smite.Net
                 _currentSession = await _restClient
                     .GetAsync<SessionModel>(APIPlatform.PC, "createsession", null)
                     .ConfigureAwait(false);
+
+                toWait = null;
+
+                await InternalSessionCreatedAsync(SessionCreatedAt.Value, SessionId);
 
                 if (_sessionId != null)
                     _sessionId = null;
