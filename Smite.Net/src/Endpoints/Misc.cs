@@ -48,7 +48,7 @@ namespace Smite.Net
         /// <returns>A dictionary of the server status of each platform.</returns>
         public async Task<IReadOnlyDictionary<APIPlatform, ServerStatus>> GetServerStatusesAsync()
         {
-            var response = await GetCollectionAsync<ServerStatusModel>(APIPlatform.PC, "gethirezserverstatus", _currentSession)
+            var response = await GetCollectionAsync<ServerStatusModel>(APIPlatform.PC, "gethirezserverstatus")
                 .ConfigureAwait(false);
 
             static APIPlatform GetPlatform(string input)
@@ -79,7 +79,7 @@ namespace Smite.Net
         /// <returns>The current patch number.</returns>
         public async Task<string> GetPatchNumberAsync()
         {
-            var response = await GetAsync<PatchInfoModel>(APIPlatform.PC, "getpatchinfo", _currentSession)
+            var response = await GetAsync<PatchInfoModel>(APIPlatform.PC, "getpatchinfo")
                 .ConfigureAwait(false);
 
             return response.version_string;

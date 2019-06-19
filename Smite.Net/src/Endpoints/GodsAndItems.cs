@@ -15,7 +15,7 @@ namespace Smite.Net
         /// <returns>A collection of God's</returns>
         public async Task<IReadOnlyCollection<God>> GetGodsAsync(Language language = Language.English)
         {
-            var response = await GetCollectionAsync<GodModel>(APIPlatform.PC, "getgods", _currentSession, (int)language)
+            var response = await GetCollectionAsync<GodModel>(APIPlatform.PC, "getgods", (int)language)
                 .ConfigureAwait(false);
 
             var gods = response.Select(x => new God(x));
