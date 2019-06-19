@@ -15,14 +15,32 @@ namespace Smite.Net
 
         public SessionModel _currentSession; //public for testing
 
+        /// <summary>
+        /// The current sessions id.
+        /// </summary>
         public string SessionId => _sessionId ?? _currentSession.session_id;
+
+        /// <summary>
+        /// When the current session was created.
+        /// </summary>
         public DateTimeOffset? SessionCreated => _currentSession is null 
             ? (DateTimeOffset?)null : Utils.ParseTime(_currentSession.timestamp);
 
+        /// <summary>
+        /// Creates a new client without a session.
+        /// </summary>
+        /// <param name="devId">Your dev id.</param>
+        /// <param name="authKey">Your auth key.</param>
         public SmiteClient(int devId, string authKey) : this(devId, authKey, null)
         {
         }
 
+        /// <summary>
+        /// Creates a new client with the specified session.
+        /// </summary>
+        /// <param name="devId">Your dev id.</param>
+        /// <param name="authKey">Your auth key.</param>
+        /// <param name="sessionId">Your session id.</param>
         public SmiteClient(int devId, string authKey, string sessionId)
         {
             if (string.IsNullOrWhiteSpace(authKey))
@@ -33,6 +51,10 @@ namespace Smite.Net
             _sessionId = sessionId;
         }
 
+
+        /// <summary>
+        /// Event that fires whenever a new log is raised.
+        /// </summary>
         public event Func<string, Task> Log;
 
         internal async Task InternalLogAsync(string log)
@@ -41,6 +63,11 @@ namespace Smite.Net
                 await Log(log);
         }
 
+        /// <summary>
+        /// Starts the clients auto-session recreation.
+        /// </summary>
+        /// <param name="revalidateAfter">When to revalidate a session that was passed on creation.</param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
         public async Task StartAsync(TimeSpan? revalidateAfter = null)
         {
             if (_currentSession != null)
