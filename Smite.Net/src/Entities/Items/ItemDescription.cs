@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Smite.Net
 {
-    public sealed class ItemDescription
+    public sealed class ItemDescription : BaseEntity
     {
         private readonly ItemDescriptionModel _model;
 
@@ -21,7 +21,7 @@ namespace Smite.Net
                 if(_stats == default)
                 {
                     _stats = new ReadOnlyCollection<ItemStat>(
-                        _model.Menuitems.Select(x => new ItemStat(x.Description, x.Value)), 
+                        _model.Menuitems.Select(x => new ItemStat(Client, x.Description, x.Value)), 
                         () => _model.Menuitems.Length);
                 }
 
@@ -29,7 +29,7 @@ namespace Smite.Net
             }
         }
 
-        internal ItemDescription(ItemDescriptionModel model)
+        internal ItemDescription(SmiteClient client, ItemDescriptionModel model) : base(client)
         {
             _model = model;
         }

@@ -1,6 +1,6 @@
 ﻿namespace Smite.Net
 {
-    public sealed class LeaderboardEntry
+    public sealed class LeaderboardEntry : BaseEntity
     {
         private readonly LeaderboardEntryModel _model;
 
@@ -39,7 +39,7 @@
         /// </summary>
         public int Rank => _model.rank;
 
-        internal LeaderboardEntry(LeaderboardEntryModel model)
+        internal LeaderboardEntry(SmiteClient client, LeaderboardEntryModel model) : base(client)
         {
             _model = model;
         }

@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class God
+    public sealed class God : BaseEntity
     {
         private readonly GodModel _model;
 
@@ -50,35 +50,35 @@ namespace Smite.Net
         /// <summary>
         /// The God's first ability.
         /// </summary>
-        public Ability FirstAbility => _first ?? (_first = new Ability(_model.Ability_1));
+        public Ability FirstAbility => _first ?? (_first = new Ability(Client, _model.Ability_1));
 
         private Ability _second;
 
         /// <summary>
         /// The God's second ability.
         /// </summary>
-        public Ability SecondAbility => _second ?? (_second = new Ability(_model.Ability_2));
+        public Ability SecondAbility => _second ?? (_second = new Ability(Client, _model.Ability_2));
 
         private Ability _third;
 
         /// <summary>
         /// The God's third ability.
         /// </summary>
-        public Ability ThirdAbility => _third ?? (_third = new Ability(_model.Ability_3));
+        public Ability ThirdAbility => _third ?? (_third = new Ability(Client, _model.Ability_3));
 
         private Ability _fourth;
 
         /// <summary>
         /// The God's ultimate ability.
         /// </summary>
-        public Ability UltimateAbility => _fourth ?? (_fourth = new Ability(_model.Ability_4));
+        public Ability UltimateAbility => _fourth ?? (_fourth = new Ability(Client, _model.Ability_4));
 
         private Ability _passive;
 
         /// <summary>
         /// The God's passive.
         /// </summary>
-        public Ability Passive => _passive ?? (_passive = new Ability(_model.Ability_5));
+        public Ability Passive => _passive ?? (_passive = new Ability(Client, _model.Ability_5));
 
         /// <summary>
         /// The God's base attack speed.
@@ -334,7 +334,7 @@ namespace Smite.Net
             }
         }
 
-        internal God(GodModel model)
+        internal God(SmiteClient client, GodModel model) : base(client)
         {
             _model = model;
         }

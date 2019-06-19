@@ -22,7 +22,7 @@ namespace Smite.Net
             var response = await GetCollectionAsync<PlayerIdByNameModel>(APIPlatform.PC, "getplayeridbyname", name)
                 .ConfigureAwait(false);
 
-            var results = response.Select(x => new PlayerNameSearchResult(x));
+            var results = response.Select(x => new PlayerNameSearchResult(this, x));
 
             return new ReadOnlyCollection<PlayerNameSearchResult>(results, () => response.Length);
         }
@@ -41,7 +41,7 @@ namespace Smite.Net
             var response = await GetCollectionAsync<PlayerModel>(APIPlatform.PC, "getplayer", name, (int)portal)
                 .ConfigureAwait(false);
 
-            var result = response.Select(x => new Player(x));
+            var result = response.Select(x => new Player(this, x));
 
             return new ReadOnlyCollection<Player>(result, () => response.Length);
         }
@@ -61,7 +61,7 @@ namespace Smite.Net
                 "getplayeridsbygamertag", (int)portal, name)
                 .ConfigureAwait(false);
 
-            var results = response.Select(x => new PlayerNameSearchResult(x));
+            var results = response.Select(x => new PlayerNameSearchResult(this, x));
 
             return new ReadOnlyCollection<PlayerNameSearchResult>(results, () => response.Length);
         }

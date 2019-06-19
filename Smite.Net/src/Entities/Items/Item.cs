@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class Item : IItem
+    public sealed class Item : BaseEntity, IItem
     {
         private readonly ItemModel _model;
 
@@ -138,9 +138,9 @@ namespace Smite.Net
         /// <summary>
         /// The items description.
         /// </summary>
-        public ItemDescription Description => _desc ?? (_desc = new ItemDescription(_model.ItemDescription));
+        public ItemDescription Description => _desc ?? (_desc = new ItemDescription(Client, _model.ItemDescription));
 
-        internal Item(ItemModel model)
+        internal Item(SmiteClient client, ItemModel model) : base(client)
         {
             _model = model;
         }

@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class PlayerNameSearchResult
+    public sealed class PlayerNameSearchResult : BaseEntity
     {
         private readonly PlayerIdByNameModel _model;
 
@@ -43,7 +43,7 @@ namespace Smite.Net
             }
         }
 
-        internal PlayerNameSearchResult(PlayerIdByNameModel model)
+        internal PlayerNameSearchResult(SmiteClient client, PlayerIdByNameModel model) : base(client)
         {
             _model = model;
         }

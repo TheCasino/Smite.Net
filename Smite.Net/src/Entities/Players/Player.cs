@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class Player
+    public sealed class Player : BaseEntity
     {
         private readonly PlayerModel _model;
 
@@ -182,138 +182,45 @@ namespace Smite.Net
         /// The players ranked conquest stats.
         /// </summary>
         public PlayerRankedStats RankedConquestStats => _conquest 
-            ?? (_conquest = new PlayerRankedStats(_model.RankedConquest));
+            ?? (_conquest = new PlayerRankedStats(Client, _model.RankedConquest));
 
         private PlayerRankedStats _conquestController;
         /// <summary>
         /// The players console ranked conquest stats.
         /// </summary>
         public PlayerRankedStats ConsoleRankedConquestStats => _conquestController 
-            ?? (_conquestController = new PlayerRankedStats(_model.RankedConquestController));
+            ?? (_conquestController = new PlayerRankedStats(Client, _model.RankedConquestController));
 
         private PlayerRankedStats _duel;
         /// <summary>
         /// The players duel stats.
         /// </summary>
-        public PlayerRankedStats DuelStats => _duel ?? (_duel = new PlayerRankedStats(_model.RankedDuel));
+        public PlayerRankedStats DuelStats => _duel ?? (_duel = new PlayerRankedStats(Client, _model.RankedDuel));
 
         private PlayerRankedStats _duelController;
         /// <summary>
         /// The players console duel stats.
         /// </summary>
         public PlayerRankedStats ConsoleDuelStats => _duelController 
-            ?? (_duelController = new PlayerRankedStats(_model.RankedDuelController));
+            ?? (_duelController = new PlayerRankedStats(Client, _model.RankedDuelController));
 
         private PlayerRankedStats _rankedJoust;
         /// <summary>
         /// The players ranked joust stats.
         /// </summary>
         public PlayerRankedStats RankedJoustStats => _rankedJoust 
-            ?? (_rankedJoust = new PlayerRankedStats(_model.RankedJoust));
+            ?? (_rankedJoust = new PlayerRankedStats(Client, _model.RankedJoust));
 
         private PlayerRankedStats _joustController;
         /// <summary>
         /// The players ranked joust stats.
         /// </summary>
         public PlayerRankedStats ConsoleRankedJoustStats => _joustController 
-            ?? (_joustController = new PlayerRankedStats(_model.RankedJoustController));
+            ?? (_joustController = new PlayerRankedStats(Client, _model.RankedJoustController));
 
-        internal Player(PlayerModel model)
+        internal Player(SmiteClient client, PlayerModel model) : base(client)
         {
             _model = model;
         }
-    }
-
-    public sealed class PlayerRankedStats
-    {
-        private readonly RankedPlayerStatsModel _model;
-
-        /// <summary>
-        /// The number of leaves this split.
-        /// </summary>
-        public int Leaves => _model.Leaves;
-
-        /// <summary>
-        /// The number of losses this split.
-        /// </summary>
-        public int Losses => _model.Losses;
-
-        /// <summary>
-        /// The current amount of TP.
-        /// </summary>
-        public int TP => _model.Points;
-
-        /// <summary>
-        /// Prvious leaderboard position.
-        /// </summary>
-        public int PreviousRank => _model.PrevRank;
-
-        /// <summary>
-        /// Current leaderboard position.
-        /// </summary>
-        public int CurrentRank => _model.Rank;
-
-        /// <summary>
-        /// Current season.
-        /// </summary>
-        public int Season => _model.Season;
-
-        /// <summary>
-        /// The trend in rank.
-        /// </summary>
-        public int Trend => _model.Trend;
-
-        /// <summary>
-        /// The number of wins this split.
-        /// </summary>
-        public int Wins => _model.Wins;
-
-        /// <summary>
-        /// What gamemode this is.
-        /// </summary>
-        public GameMode GameMode
-        {
-            get
-            {
-                switch(_model.Name)
-                {
-                    case "League":
-                        return GameMode.ConquestRanked;
-
-                    case "League Controller":
-                        return GameMode.ConquestRankedController;
-
-                    case "Duel":
-                        return GameMode.Duel;
-
-                    case "Duel Controller":
-                        return GameMode.DuelController;
-
-                    case "Joust":
-                        return GameMode.JoustRanked;
-
-                    case "Joust Controller":
-                        return GameMode.JoustRankedController;
-
-                    default:
-                        throw new ArgumentOutOfRangeException($"Unknown Name type {_model.Name}", nameof(_model.Name));
-                }
-            }
-        }
-
-        /// <summary>
-        /// The players MMR for this gamemode.
-        /// </summary>
-        public double MMR => _model.Rank_Stat;
-
-        /// <summary>
-        /// The players id.
-        /// </summary>
-        public int? PlayerId => _model.player_id;
-
-        internal PlayerRankedStats(RankedPlayerStatsModel model)
-        {
-            _model = model;
-        }
-    }
+    }    
 }

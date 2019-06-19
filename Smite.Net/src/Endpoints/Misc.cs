@@ -39,7 +39,7 @@ namespace Smite.Net
         {
             var response = await GetAsync<DataUsedModel>(APIPlatform.PC, "getdataused").ConfigureAwait(false);
 
-            return new DataUsed(response);
+            return new DataUsed(this, response);
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Smite.Net
                 throw new ArgumentException("Unkown platform type.");
             }
 
-            var dict = response.ToDictionary(x => GetPlatform(x.platform), x => new ServerStatus(x));
+            var dict = response.ToDictionary(x => GetPlatform(x.platform), x => new ServerStatus(this, x));
 
             return new ReadOnlyDictionary<APIPlatform, ServerStatus>(dict);
         }

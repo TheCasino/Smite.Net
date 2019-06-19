@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class DataUsed
+    public sealed class DataUsed : BaseEntity
     {
         private readonly DataUsedModel _model;
 
@@ -46,7 +46,7 @@ namespace Smite.Net
             ? _sessionTimeoutLimit = TimeSpan.FromMinutes(_model.Session_Time_Limit)
             : _sessionTimeoutLimit;
 
-        internal DataUsed(DataUsedModel model)
+        internal DataUsed(SmiteClient client, DataUsedModel model) : base(client)
         {
             _model = model;
         }

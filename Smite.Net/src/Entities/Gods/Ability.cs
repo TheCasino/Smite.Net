@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Smite.Net
 {
-    public sealed class Ability
+    public sealed class Ability : BaseEntity
     {
         private readonly AbilityModel _model;
 
@@ -57,7 +57,7 @@ namespace Smite.Net
                     stats.AddRange(_model.Description.itemDescription.menuitems);
                     stats.AddRange(_model.Description.itemDescription.rankitems);
 
-                    var abilities = stats.Select(x => new AbilityStats
+                    var abilities = stats.Select(x => new AbilityStats(Client)
                     {
                         Description = x.description,
                         Value = x.value
@@ -70,7 +70,7 @@ namespace Smite.Net
             }
         }
 
-        internal Ability(AbilityModel model)
+        internal Ability(SmiteClient client, AbilityModel model) : base(client)
         {
             _model = model;
         }

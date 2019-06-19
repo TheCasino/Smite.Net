@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class RecommendedItem : IItem
+    public sealed class RecommendedItem : BaseEntity, IItem
     {
         private readonly RecommendedItemModel _model;
 
@@ -104,7 +104,7 @@ namespace Smite.Net
         /// </summary>
         public int RoleId => _model.role_value_id;
 
-        internal RecommendedItem(RecommendedItemModel model)
+        internal RecommendedItem(SmiteClient client, RecommendedItemModel model) : base(client)
         {
             _model = model;
         }

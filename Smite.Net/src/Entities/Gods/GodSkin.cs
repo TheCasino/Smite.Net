@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class GodSkin
+    public sealed class GodSkin : BaseEntity
     {
         private readonly GodSkinModel _model;
 
@@ -80,7 +80,7 @@ namespace Smite.Net
         /// </summary>
         public string SkinName => _model.skin_name;
 
-        internal GodSkin(GodSkinModel model)
+        internal GodSkin(SmiteClient client, GodSkinModel model) : base(client)
         {
             _model = model;
         }

@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class ServerStatus
+    public sealed class ServerStatus : BaseEntity
     {
         private readonly ServerStatusModel _model;
 
@@ -46,7 +46,7 @@ namespace Smite.Net
         /// </summary>
         public string Version => _model.version;
 
-        internal ServerStatus(ServerStatusModel model)
+        internal ServerStatus(SmiteClient client, ServerStatusModel model) : base(client)
         {
             _model = model;
         }

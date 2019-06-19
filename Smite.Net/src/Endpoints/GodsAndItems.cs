@@ -18,7 +18,7 @@ namespace Smite.Net
             var response = await GetCollectionAsync<GodModel>(APIPlatform.PC, "getgods", (int)language)
                 .ConfigureAwait(false);
 
-            var gods = response.Select(x => new God(x));
+            var gods = response.Select(x => new God(this, x));
 
             return new ReadOnlyCollection<God>(gods, () => response.Length);
         }
@@ -58,7 +58,7 @@ namespace Smite.Net
             var response = await GetCollectionAsync<LeaderboardEntryModel>(APIPlatform.PC,
                     "getgodleaderboard", godId, (int)gamemode).ConfigureAwait(false);
 
-            return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(x)),
+            return new ReadOnlyCollection<LeaderboardEntry>(response.Select(x => new LeaderboardEntry(this, x)),
                 () => response.Length);
         }
 
@@ -93,7 +93,7 @@ namespace Smite.Net
                 "getgodskins", godId, (int)language)
                 .ConfigureAwait(false);
 
-            return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(x)), () => response.Length);
+            return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(this, x)), () => response.Length);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Smite.Net
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<RecommendedItem>(
-                response.Select(x => new RecommendedItem(x)), () => response.Length);
+                response.Select(x => new RecommendedItem(this, x)), () => response.Length);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace Smite.Net
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<Item>(
-                resp.Select(x => new Item(x)), () => resp.Length);
+                resp.Select(x => new Item(this, x)), () => resp.Length);
         }
     }
 }
