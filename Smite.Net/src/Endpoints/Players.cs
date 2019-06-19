@@ -28,12 +28,12 @@ namespace Smite.Net
         }
 
         /// <summary>
-        /// Gets a player using their id.
+        /// Gets a player using their name.
         /// </summary>
         /// <param name="id">The id of the player.</param>
         /// <param name="portal">The portal to get this player from.</param>
         /// <returns>The player corresponding to the given id.</returns>
-        public async Task<IReadOnlyCollection<Player>> GetPlayerAsync(string name, Portal? portal = null)
+        public async Task<IReadOnlyCollection<Player>> GetPlayerAsync(string name, Portal portal)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException(nameof(name));
@@ -49,16 +49,16 @@ namespace Smite.Net
         /// <summary>
         /// Gets the player ids corresponding to the specified name.
         /// </summary>
-        /// <param name="name">The name of the player.</param>
+        /// <param name="gamertag">The name of the player.</param>
         /// <param name="portal">The portal to use.</param>
         /// <returns>A collection of found players.</returns>
-        public async Task<IReadOnlyCollection<PlayerNameSearchResult>> GetPlayerIdsFromGamertagAsync(string name, Portal portal)
+        public async Task<IReadOnlyCollection<PlayerNameSearchResult>> GetPlayerIdsFromGamertagAsync(string gamertag, Portal portal)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(gamertag))
+                throw new ArgumentNullException(nameof(gamertag));
 
             var response = await GetCollectionAsync<PlayerIdByNameModel>(APIPlatform.PC, 
-                "getplayeridsbygamertag", (int)portal, name)
+                "getplayeridsbygamertag", (int)portal, gamertag)
                 .ConfigureAwait(false);
 
             var results = response.Select(x => new PlayerNameSearchResult(this, x));
