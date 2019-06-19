@@ -311,28 +311,35 @@ namespace Smite.Net
         {
             get
             {
-                switch(_model.Type)
+                var types = _model.Type.Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                Playstyle style = default;
+
+                for(int i = 0; i < types.Length; i++)
                 {
-                    case " Magical":
-                        return Playstyle.Magical;
+                    switch(types[i])
+                    {
+                        case "Magical":
+                            style |= Playstyle.Magical;
+                            break;
 
-                    case " Melee, Magical":
-                        return Playstyle.MeleeMagical;
+                        case "Physical":
+                            style |= Playstyle.Physical;
+                            break;
 
-                    case " Melee, Physical":
-                        return Playstyle.MeleePhysical;
+                        case "Ranged":
+                            style |= Playstyle.Ranged;
+                            break;
 
-                    case " Ranged":
-                        return Playstyle.Ranged;
+                        case "Melee":
+                            style |= Playstyle.Melee;
+                            break;
 
-                    case " Ranged, Magical":
-                        return Playstyle.RangedMagical;
-
-                    case " Ranged, Physical":
-                        return Playstyle.RangedPhysical;
+                        default:
+                            throw new ArgumentException($"Unknown Playstyle Type {_model.Type}.");
+                    }
                 }
 
-                throw new ArgumentException($"Unknown Playstyle Type {_model.Type}.");
+                return style;
             }
         }
 

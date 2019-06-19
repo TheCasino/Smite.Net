@@ -28,11 +28,9 @@
 
     public enum Playstyle
     {
-        Magical         = 1,
-        MeleeMagical    = 2,
-        MeleePhysical   = 4,
-        Ranged          = 8,
-        RangedMagical   = 16,
-        RangedPhysical  = 32
+        Magical     = 1,
+        Melee       = 2,
+        Physical    = 4,
+        Ranged      = 8
     }
 }

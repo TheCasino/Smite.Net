@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Smite.Net
+﻿namespace Smite.Net
 {
     public enum ItemCategory
     {
@@ -20,16 +18,15 @@ namespace Smite.Net
         Tutorial
     }
 
-    [Flags]
     public enum ClassAvailability
     {
-        Empty,
-        NoRestrictions,
-        Assassin,
-        Hunter,
-        Mage,
-        Guardian,
-        Warrior
+        Empty           = 1,
+        NoRestrictions  = 2,
+        Assassin        = 4,
+        Hunter          = 8,
+        Mage            = 16,
+        Guardian        = 32,
+        Warrior         = 64
     }
 
     public enum ItemType
