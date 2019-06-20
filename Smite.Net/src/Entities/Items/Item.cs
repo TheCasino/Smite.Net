@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class Item : BaseEntity, IItem
+    public sealed class Item : BaseEntity
     {
         private readonly ItemModel _model;
 
