@@ -8,13 +8,29 @@ namespace Smite.Net
     {
         private readonly FriendModel _model;
 
+        /// <summary>
+        /// The friends name.
+        /// </summary>
         public string Name => _model.name;
 
+        /// <summary>
+        /// The friends account id.
+        /// </summary>
         public int AccountId => _model.account_id;
+
+        /// <summary>
+        /// The friends player id.
+        /// </summary>
         public int PlayerId => _model.player_id;
 
         private Uri _url;
-        public Uri AvatarUrl => _url ?? (_url = new Uri(_model.avatar_url));
+
+        /// <summary>
+        /// The friends avatar url.
+        /// </summary>
+        public Uri AvatarUrl => string.IsNullOrWhiteSpace(_model.avatar_url) 
+            ? null 
+            : _url ?? (_url = new Uri(_model.avatar_url));
 
         internal Friend(SmiteClient client, FriendModel model) : base(client)
         {
