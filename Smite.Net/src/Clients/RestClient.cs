@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
@@ -16,6 +17,7 @@ namespace Smite.Net
         private readonly string _authKey;
         private readonly int _devId;
         private readonly HttpClient _httpClient;
+        private readonly JsonSerializer _serializer;
         private readonly SemaphoreSlim _semaphore;
         private readonly SmiteClient _smiteClient;
 
@@ -31,6 +33,8 @@ namespace Smite.Net
 
             _httpClient = new HttpClient();
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _serializer = new JsonSerializer();
 
             _semaphore = new SemaphoreSlim(1);
         }
@@ -65,8 +69,8 @@ namespace Smite.Net
 
             try
             {
-
-                return JsonConvert.DeserializeObject<T>(data);
+                using var reader = new StringReader(data);
+                return _serializer.Deserialize<T>(new JsonTextReader(reader));
             }
             catch(JsonReaderException)
             {
