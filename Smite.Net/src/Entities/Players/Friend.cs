@@ -51,5 +51,12 @@ namespace Smite.Net
         /// <returns>A collection of friends.</returns>
         public async Task<IReadOnlyCollection<Friend>> GetFriendsAsync()
             => await Client.GetFriendsAsync(PlayerId).ConfigureAwait(false);
+
+        /// <summary>
+        /// Gets the God stats for this player.
+        /// </summary>
+        /// <returns>A collection of God stats.</returns>
+        public async Task<IReadOnlyCollection<GodStats>> GetGodStatsAsync()
+            => await Client.GetGodStatsAsync(PlayerId).ConfigureAwait(false);
     }
 }

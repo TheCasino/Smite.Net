@@ -84,5 +84,24 @@ namespace Smite.Net
 
             return new ReadOnlyCollection<Friend>(results, () => response.Length);
         }
+
+        /// <summary>
+        /// Gets the God stats for the specified player.
+        /// </summary>
+        /// <param name="playerId">The id of the player.</param>
+        /// <returns>A collection of God stats.</returns>
+        public async Task<IReadOnlyCollection<GodStats>> GetGodStatsAsync(int playerId)
+        {
+            if (playerId < 0)
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+
+            var response = await GetCollectionAsync<GodStatsModel>(APIPlatform.PC,
+                "getgodranks", playerId)
+                .ConfigureAwait(false);
+
+            var results = response.Select(x => new GodStats(this, x));
+
+            return new ReadOnlyCollection<GodStats>(results, () => response.Length);
+        }
     }
 }
