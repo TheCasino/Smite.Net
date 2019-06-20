@@ -24,22 +24,6 @@ namespace Smite.Net
         }
 
         /// <summary>
-        /// Gets the leaderboard for the specified God.
-        /// </summary>
-        /// <param name="god">The God that you want the leaderboard for.</param>
-        /// <param name="gamemode">The GameMode that you want.</param>
-        /// <returns>A collection of LeaderboardEntry's.</returns>
-        public async Task<IReadOnlyCollection<LeaderboardEntry>> GetLeaderboardAsync(God god, GameMode gamemode)
-        {
-            if (god is null)
-                throw new ArgumentNullException(nameof(god));
-
-            var entries = await GetLeaderboardAsync(god.Id, gamemode).ConfigureAwait(false);
-
-            return entries;
-        }
-
-        /// <summary>
         /// Gets the leaderboard for the specified God id.
         /// </summary>
         /// <param name="godId">The id of the God that you want the leaderboard for.</param>
@@ -63,22 +47,6 @@ namespace Smite.Net
         }
 
         /// <summary>
-        /// Gets the skins for the specified God.
-        /// </summary>
-        /// <param name="god">The God you want to fetch the skins for.</param>
-        /// <param name="language">The language to use.</param>
-        /// <returns>A collection of skins.</returns>
-        public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(God god, Language language = Language.English)
-        {
-            if (god is null)
-                throw new ArgumentNullException(nameof(god));
-
-            var entries = await GetSkinsAsync(god.Id, language).ConfigureAwait(false);
-
-            return entries;
-        }
-
-        /// <summary>
         /// Gets the skins for ths specified God id.
         /// </summary>
         /// <param name="godId">The id of the God you want to get the skins for.</param>
@@ -94,23 +62,6 @@ namespace Smite.Net
                 .ConfigureAwait(false);
 
             return new ReadOnlyCollection<GodSkin>(response.Select(x => new GodSkin(this, x)), () => response.Length);
-        }
-
-        /// <summary>
-        /// Gets the recommended items for this God.
-        /// </summary>
-        /// <param name="god">The God you want to fetch the items for.</param>
-        /// <param name="language">The language to use.</param>
-        /// <returns>A collection of recommended items.</returns>
-        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(God god,
-            Language language = Language.English)
-        {
-            if (god is null)
-                throw new ArgumentNullException(nameof(god));
-
-            var items = await GetRecommendedItemsAsync(god.Id, language).ConfigureAwait(false);
-
-            return items;
         }
 
         /// <summary>
