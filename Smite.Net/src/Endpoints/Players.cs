@@ -103,5 +103,22 @@ namespace Smite.Net
 
             return new ReadOnlyCollection<GodStats>(results, () => response.Length);
         }
+
+        /// <summary>
+        /// Gets the accolades for the specified player.
+        /// </summary>
+        /// <param name="playerId">The id of the player.</param>
+        /// <returns>The players accolades.</returns>
+        public async Task<PlayerAccolades> GetPlayerAccoladesAsync(int playerId)
+        {
+            if (playerId < 0)
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+
+            var response = await GetAsync<PlayerAccoladesModel>(APIPlatform.PC,
+                "getplayerachievements", playerId)
+                .ConfigureAwait(false);
+
+            return new PlayerAccolades(this, response);
+        }
     }
 }
