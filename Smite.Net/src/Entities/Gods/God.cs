@@ -354,7 +354,7 @@ namespace Smite.Net
         /// <param name="language">The language to use for the response.</param>
         /// <returns>A collection of recommended items.</returns>
         public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(Language language = Language.English)
-            => await Client.GetRecommendedItemsAsync(this, language).ConfigureAwait(false);
+            => await Client.GetRecommendedItemsAsync(Id, language).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the leaderboard entries for this God.
@@ -362,7 +362,7 @@ namespace Smite.Net
         /// <param name="gameMode">The gamemode that you want the leaderboard for.</param>
         /// <returns>A collection of leaderboard entries.</returns>
         public async Task<IReadOnlyCollection<LeaderboardEntry>> GetLeaderBoardAsync(GameMode gameMode)
-            => await Client.GetLeaderboardAsync(this, gameMode).ConfigureAwait(false);
+            => await Client.GetLeaderboardAsync(Id, gameMode).ConfigureAwait(false);
 
         /// <summary>
         /// Gets the skins for this God.
@@ -370,6 +370,6 @@ namespace Smite.Net
         /// <param name="language">The language to use for the response.</param>
         /// <returns>A collection of skins.</returns>
         public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(Language language = Language.English)
-            => await Client.GetSkinsAsync(this, language).ConfigureAwait(false);
+            => await Client.GetSkinsAsync(Id, language).ConfigureAwait(false);
     }
 }
