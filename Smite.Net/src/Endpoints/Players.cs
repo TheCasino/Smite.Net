@@ -65,5 +65,24 @@ namespace Smite.Net
 
             return new ReadOnlyCollection<PlayerNameSearchResult>(results, () => response.Length);
         }
+
+        /// <summary>
+        /// Gets the friends of the specified player.
+        /// </summary>
+        /// <param name="playerId">The player that you want to get the friends for.</param>
+        /// <returns>A collection of friends of this player.</returns>
+        public async Task<IReadOnlyCollection<Friend>> GetFriendsAsync(int playerId)
+        {
+            if (playerId < 0)
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+
+            var response = await GetCollectionAsync<FriendModel>(APIPlatform.PC,
+                "getfriends", playerId)
+                .ConfigureAwait(false);
+
+            var results = response.Select(x => new Friend(this, x));
+
+            return new ReadOnlyCollection<Friend>(results, () => response.Length);
+        }
     }
 }

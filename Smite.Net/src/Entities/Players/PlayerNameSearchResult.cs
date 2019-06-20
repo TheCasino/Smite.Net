@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Smite.Net
 {
@@ -47,5 +49,12 @@ namespace Smite.Net
         {
             _model = model;
         }
+
+        /// <summary>
+        /// Gets the friends for this player.
+        /// </summary>
+        /// <returns>A collection of friends.</returns>
+        public async Task<IReadOnlyCollection<Friend>> GetFriendsAsync()
+            => await Client.GetFriendsAsync(PlayerId).ConfigureAwait(false);
     }
 }
