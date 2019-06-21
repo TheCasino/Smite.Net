@@ -8,20 +8,29 @@ namespace Smite.Net
     {
         private readonly ItemDescriptionModel _model;
 
+        /// <summary>
+        /// The items description.
+        /// </summary>
         public string Description => _model.Description;
 
+        /// <summary>
+        /// The items affect.
+        /// </summary>
         public string Affect => _model.SecondaryDescription;
 
         private IReadOnlyCollection<ItemStat> _stats;
-        
+
+        /// <summary>
+        /// The items stats.
+        /// </summary>
         public IReadOnlyCollection<ItemStat> Stats
         {
             get
             {
-                if(_stats == default)
+                if (_stats == default)
                 {
                     _stats = new ReadOnlyCollection<ItemStat>(
-                        _model.Menuitems.Select(x => new ItemStat(Client, x.Description, x.Value)), 
+                        _model.Menuitems.Select(x => new ItemStat(Client, x.Description, x.Value)),
                         () => _model.Menuitems.Length);
                 }
 
