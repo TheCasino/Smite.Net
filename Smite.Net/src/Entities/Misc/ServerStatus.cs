@@ -14,20 +14,20 @@ namespace Smite.Net
         /// <summary>
         /// The current status of the servers.
         /// </summary>
-        public Status Status
+        public APIStatus Status
         {
             get
             {
                 switch(_model.status)
                 {
                     case "UP":
-                        return Status.Up;
+                        return APIStatus.Up;
 
                     case "DOWN":
-                        return Status.Down;
+                        return APIStatus.Down;
 
                     default:
-                        return Status.Unknown;
+                        return APIStatus.Unknown;
                 }
             }
         }

@@ -7,7 +7,7 @@
         PS4
     }
 
-    public enum Status
+    public enum APIStatus
     {
         Up,
         Down,

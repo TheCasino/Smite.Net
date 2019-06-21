@@ -31,4 +31,14 @@
         Masters,
         Grandmasters
     }
+
+    public enum PlayerStatus
+    {
+        Offline,
+        InLobby,
+        GodSelection,
+        InGame,
+        Online,
+        Unknown
+    }
 }

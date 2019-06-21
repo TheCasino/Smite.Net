@@ -120,5 +120,24 @@ namespace Smite.Net
 
             return new PlayerAccolades(this, response);
         }
+
+        /// <summary>
+        /// Gets the current status of the specified player.
+        /// </summary>
+        /// <param name="playerId">The id of the player.</param>
+        /// <returns>A collection of player statuses.</returns>
+        public async Task<IReadOnlyCollection<PlayerCurrentStatus>> GetStatusAsync(int playerId)
+        {
+            if (playerId < 0)
+                throw new ArgumentOutOfRangeException(nameof(playerId));
+
+            var response = await GetCollectionAsync<PlayerStatusModel>(APIPlatform.PC,
+                "getplayerstatus", playerId)
+                .ConfigureAwait(false);
+
+            var results = response.Select(x => new PlayerCurrentStatus(this, x));
+
+            return new ReadOnlyCollection<PlayerCurrentStatus>(results, () => response.Length);
+        }
     }
 }
