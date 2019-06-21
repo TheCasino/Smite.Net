@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
 
 namespace Smite.Net
 {
-    public sealed class Player : BaseEntity
+    public sealed class Player : BaseEntity, IPlayer
     {
         private readonly PlayerModel _model;
 
@@ -203,40 +201,26 @@ namespace Smite.Net
         /// <summary>
         /// The players console duel stats.
         /// </summary>
-        public PlayerRankedStats ConsoleDuelStats => _duelController 
+        public PlayerRankedStats ConsoleDuelStats => _duelController
             ?? (_duelController = new PlayerRankedStats(Client, _model.RankedDuelController));
 
         private PlayerRankedStats _rankedJoust;
         /// <summary>
         /// The players ranked joust stats.
         /// </summary>
-        public PlayerRankedStats RankedJoustStats => _rankedJoust 
+        public PlayerRankedStats RankedJoustStats => _rankedJoust
             ?? (_rankedJoust = new PlayerRankedStats(Client, _model.RankedJoust));
 
         private PlayerRankedStats _joustController;
         /// <summary>
         /// The players ranked joust stats.
         /// </summary>
-        public PlayerRankedStats ConsoleRankedJoustStats => _joustController 
+        public PlayerRankedStats ConsoleRankedJoustStats => _joustController
             ?? (_joustController = new PlayerRankedStats(Client, _model.RankedJoustController));
 
         internal Player(SmiteClient client, PlayerModel model) : base(client)
         {
             _model = model;
         }
-
-        /// <summary>
-        /// Gets this players friends.
-        /// </summary>
-        /// <returns>A collection of friends.</returns>
-        public async Task<IReadOnlyCollection<Friend>> GetFriendsAsync()
-            => await Client.GetFriendsAsync(PlayerId).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets the God stats for this player.
-        /// </summary>
-        /// <returns>A collection of God stats.</returns>
-        public async Task<IReadOnlyCollection<GodStats>> GetGodStatsAsync()
-            => await Client.GetGodStatsAsync(PlayerId).ConfigureAwait(false);
-    }    
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Smite.Net
 {
-    public sealed class PlayerAccolades : BaseEntity
+    public sealed class PlayerAccolades : BaseEntity, IPlayer
     {
         private readonly PlayerAccoladesModel _model;
 

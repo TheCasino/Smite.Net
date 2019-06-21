@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Smite.Net
 {
-    public sealed class GodSkin : BaseEntity
+    public sealed class GodSkin : BaseEntity, IGod
     {
         private readonly GodSkinModel _model;
 

@@ -1,6 +1,6 @@
 ﻿namespace Smite.Net
 {
-    public sealed class LeaderboardEntry : BaseEntity
+    public sealed class LeaderboardEntry : BaseEntity, IPlayer
     {
         private readonly LeaderboardEntryModel _model;
 

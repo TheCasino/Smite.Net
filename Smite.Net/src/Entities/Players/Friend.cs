@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Smite.Net
 {
-    public sealed class Friend : BaseEntity
+    public sealed class Friend : BaseEntity, IPlayer
     {
         private readonly FriendModel _model;
 
@@ -44,19 +44,5 @@ namespace Smite.Net
         /// <returns>A collection of players pertaining to this player.</returns>
         public async Task<IReadOnlyCollection<Player>> GetPlayerAsync(Portal portal)
             => await Client.GetPlayerAsync(Name, portal).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets this players friends.
-        /// </summary>
-        /// <returns>A collection of friends.</returns>
-        public async Task<IReadOnlyCollection<Friend>> GetFriendsAsync()
-            => await Client.GetFriendsAsync(PlayerId).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets the God stats for this player.
-        /// </summary>
-        /// <returns>A collection of God stats.</returns>
-        public async Task<IReadOnlyCollection<GodStats>> GetGodStatsAsync()
-            => await Client.GetGodStatsAsync(PlayerId).ConfigureAwait(false);
     }
 }

@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace Smite.Net
 {
-    public sealed class GodStats : BaseEntity
+    public sealed class GodStats : BaseEntity, IPlayer, IGod
     {
         private readonly GodStatsModel _model;
 
@@ -66,21 +63,5 @@ namespace Smite.Net
         {
             _model = model;
         }
-
-        /// <summary>
-        /// Gets the skins for this God.
-        /// </summary>
-        /// <param name="language">The language to use for the response.</param>
-        /// <returns>A collection of skins.</returns>
-        public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(Language language = Language.English)
-            => await Client.GetSkinsAsync(GodId, language).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets the recommended items for this GOd.
-        /// </summary>
-        /// <param name="language">The language to use for the response.</param>
-        /// <returns>A collection of recommended items.</returns>
-        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(Language language = Language.English)
-            => await Client.GetRecommendedItemsAsync(GodId, language).ConfigureAwait(false);
     }
 }

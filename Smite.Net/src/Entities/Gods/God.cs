@@ -1,17 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Smite.Net
 {
-    public sealed class God : BaseEntity
+    public sealed class God : BaseEntity, IGod
     {
         private readonly GodModel _model;
 
         /// <summary>
         /// The God's id.
         /// </summary>
-        public int Id => _model.id;
+        public int GodId => _model.id;
 
         private Uri _cardArtUrl;
 
@@ -170,7 +170,7 @@ namespace Smite.Net
         /// <summary>
         /// The God's name.
         /// </summary>
-        public string Name => _model.Name;
+        public string GodName => _model.Name;
 
         /// <summary>
         /// If the God is currently in the free rotation pool.
@@ -347,29 +347,5 @@ namespace Smite.Net
         {
             _model = model;
         }
-
-        /// <summary>
-        /// Gets the recommended items for this God.
-        /// </summary>
-        /// <param name="language">The language to use for the response.</param>
-        /// <returns>A collection of recommended items.</returns>
-        public async Task<IReadOnlyCollection<RecommendedItem>> GetRecommendedItemsAsync(Language language = Language.English)
-            => await Client.GetRecommendedItemsAsync(Id, language).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets the leaderboard entries for this God.
-        /// </summary>
-        /// <param name="gameMode">The gamemode that you want the leaderboard for.</param>
-        /// <returns>A collection of leaderboard entries.</returns>
-        public async Task<IReadOnlyCollection<LeaderboardEntry>> GetLeaderBoardAsync(GameMode gameMode)
-            => await Client.GetLeaderboardAsync(Id, gameMode).ConfigureAwait(false);
-
-        /// <summary>
-        /// Gets the skins for this God.
-        /// </summary>
-        /// <param name="language">The language to use for the response.</param>
-        /// <returns>A collection of skins.</returns>
-        public async Task<IReadOnlyCollection<GodSkin>> GetSkinsAsync(Language language = Language.English)
-            => await Client.GetSkinsAsync(Id, language).ConfigureAwait(false);
     }
 }

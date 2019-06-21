@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace Smite.Net
 {
-    public sealed class RecommendedItem : BaseEntity
+    public sealed class RecommendedItem : BaseEntity, IGod
     {
         private readonly RecommendedItemModel _model;
 

@@ -2,7 +2,7 @@
 
 namespace Smite.Net
 {
-    public sealed class PlayerRankedStats : BaseEntity
+    public sealed class PlayerRankedStats : BaseEntity, IPlayer
     {
         private readonly RankedPlayerStatsModel _model;
 
@@ -87,7 +87,7 @@ namespace Smite.Net
         /// <summary>
         /// The players id.
         /// </summary>
-        public int? PlayerId => _model.player_id;
+        public int PlayerId => _model.player_id ?? 0;
 
         internal PlayerRankedStats(SmiteClient client, RankedPlayerStatsModel model) : base(client)
         {

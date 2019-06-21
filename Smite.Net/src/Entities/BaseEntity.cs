@@ -1,6 +1,6 @@
 ﻿namespace Smite.Net
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity : IEntity
     {
         /// <summary>
         /// The client that was used to create the entity.
