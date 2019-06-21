@@ -44,5 +44,8 @@ namespace Smite.Net
         /// <returns>A collection of players pertaining to this player.</returns>
         public async Task<IReadOnlyCollection<Player>> GetPlayerAsync(Portal portal)
             => await Client.GetPlayerAsync(Name, portal).ConfigureAwait(false);
+
+        public override string ToString()
+            => Name;
     }
 }

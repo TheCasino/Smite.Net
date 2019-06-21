@@ -222,5 +222,8 @@ namespace Smite.Net
         {
             _model = model;
         }
+
+        public override string ToString()
+            => HirezGamertag ?? HirezPlayerName ?? Name;
     }
 }

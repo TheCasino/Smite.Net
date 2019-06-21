@@ -144,5 +144,8 @@ namespace Smite.Net
         {
             _model = model;
         }
+
+        public override string ToString()
+            => Name;
     }
 }
